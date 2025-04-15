@@ -1,0 +1,65 @@
+---
+compiled_package_info:
+  package_name: EmojicoinDotFun
+  address_alias_instantiation:
+    Extensions: "0000000000000000000000000000000000000000000000000000000000000001"
+    aptos_framework: "0000000000000000000000000000000000000000000000000000000000000001"
+    aptos_fungible_asset: 000000000000000000000000000000000000000000000000000000000000000a
+    aptos_std: "0000000000000000000000000000000000000000000000000000000000000001"
+    aptos_token: "0000000000000000000000000000000000000000000000000000000000000003"
+    black_cat_market: cc15b5b6854ea547e516461dca1b6616697c570240f980e964a0739f8dba74cf
+    black_heart_market: f4c8175ca990f11c733b43b9bad3bc4139908190b80d591ecfd40eba3bc82708
+    coin_factory: 000000000000000000000000000000000000000000000000000000000000aaaa
+    core_resources: 000000000000000000000000000000000000000000000000000000000a550c18
+    emojicoin_dot_fun: 000000000000000000000000000000000000000000000000000000000000c0de
+    std: "0000000000000000000000000000000000000000000000000000000000000001"
+    vm: "0000000000000000000000000000000000000000000000000000000000000000"
+    vm_reserved: "0000000000000000000000000000000000000000000000000000000000000000"
+    yellow_heart_market: c050f3cc6b85ef42a2fb3ab073f6343c32b19c3c25f876c8ab3eb2c07aca1972
+  source_digest: 9F08B8BD0F0F081287B82F4AB2FA624016E0E15030655BF4692DA28BC3FCC2E3
+  build_flags:
+    dev_mode: true
+    test_mode: false
+    override_std: ~
+    generate_docs: false
+    generate_abis: false
+    generate_move_model: true
+    full_model_generation: true
+    install_dir: ~
+    force_recompilation: false
+    additional_named_addresses: {}
+    fetch_deps_only: false
+    skip_fetch_latest_git_deps: false
+    compiler_config:
+      bytecode_version: 7
+      known_attributes:
+        - bytecode_instruction
+        - deprecated
+        - event
+        - expected_failure
+        - "fmt::skip"
+        - legacy_entry_fun
+        - "lint::allow_unsafe_randomness"
+        - "lint::skip"
+        - module_lock
+        - "mutation::skip"
+        - native_interface
+        - persistent
+        - randomness
+        - resource_group
+        - resource_group_member
+        - test
+        - test_only
+        - verify_only
+        - view
+      skip_attribute_checks: false
+      compiler_version: V2_0
+      language_version: V2_1
+      experiments:
+        - optimize=on
+dependencies:
+  - AptosFramework
+  - AptosStdlib
+  - EmojicoinDotFunCoinFactory
+  - MoveStdlib
+bytecode_deps: []
