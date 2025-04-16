@@ -2680,11 +2680,12 @@ let integrator_fee = fee;
     }
 
     #[test_only] public fun register_market_without_publish(
-        registrant: &signer,
-        emojis: vector<vector<u8>>,
-        integrator: address,
+       registrant: &signer,
+    title: vector<u8>,
+    symbol: vector<u8>,
+    integrator: address,
     ) acquires Market, Registry, RegistryAddress {
-        register_market_inner(registrant, emojis, integrator, false);
+      register_market_inner(registrant, title, symbol, integrator, true);
     }
 
     #[test_only] public fun tvl_clamm_test_only(virtual_reserves: Reserves): u128 {
