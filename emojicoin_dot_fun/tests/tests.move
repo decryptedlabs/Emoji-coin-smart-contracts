@@ -477,33 +477,33 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         market_address
     }
 
-    public fun assert_chat(
-        mock_chat: MockChat,
-        chat: Chat,
-    ) {
-        let (
-            market_metadata,
-            emit_time,
-            emit_market_nonce,
-            user,
-            message,
-            user_emojicoin_balance,
-            circulating_supply,
-            balance_as_fraction_of_circulating_supply_q64,
-        ) = unpack_chat(chat);
-        assert_market_metadata(mock_chat.market_metadata, market_metadata);
-        assert!(emit_time == mock_chat.emit_time, 0);
-        assert!(emit_market_nonce == mock_chat.emit_market_nonce, 0);
-        assert!(user == mock_chat.user, 0);
-        assert!(message == mock_chat.message, 0);
-        assert!(user_emojicoin_balance == mock_chat.user_emojicoin_balance, 0);
-        assert!(circulating_supply == mock_chat.circulating_supply, 0);
-        assert!(
-            balance_as_fraction_of_circulating_supply_q64 ==
-                mock_chat.balance_as_fraction_of_circulating_supply_q64,
-            0
-        );
-    }
+    // public fun assert_chat(
+    //     mock_chat: MockChat,
+    //     chat: Chat,
+    // ) {
+    //     let (
+    //         market_metadata,
+    //         emit_time,
+    //         emit_market_nonce,
+    //         user,
+    //         message,
+    //         user_emojicoin_balance,
+    //         circulating_supply,
+    //         balance_as_fraction_of_circulating_supply_q64,
+    //     ) = unpack_chat(chat);
+    //     assert_market_metadata(mock_chat.market_metadata, market_metadata);
+    //     assert!(emit_time == mock_chat.emit_time, 0);
+    //     assert!(emit_market_nonce == mock_chat.emit_market_nonce, 0);
+    //     assert!(user == mock_chat.user, 0);
+    //     assert!(message == mock_chat.message, 0);
+    //     assert!(user_emojicoin_balance == mock_chat.user_emojicoin_balance, 0);
+    //     assert!(circulating_supply == mock_chat.circulating_supply, 0);
+    //     assert!(
+    //         balance_as_fraction_of_circulating_supply_q64 ==
+    //             mock_chat.balance_as_fraction_of_circulating_supply_q64,
+    //         0
+    //     );
+    // }
 
     public fun assert_coin_name_and_symbol<Emojicoin, EmojicoinLP>(
     title: vector<u8>,
@@ -2445,23 +2445,23 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
 //         );
 //     }
 
-    #[test, expected_failure(
-        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NOT_SUPPORTED_CHAT_EMOJI,
-        location = emojicoin_dot_fun
-    )] fun chat_message_invalid_emoji() {
-        init_package();
-     init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+    // #[test, expected_failure(
+    //     abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NOT_SUPPORTED_CHAT_EMOJI,
+    //     location = emojicoin_dot_fun
+    // )] fun chat_message_invalid_emoji() {
+    //     init_package();
+    //  init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
 
-        chat<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-            &get_signer(USER),
-            @black_cat_market,
-            vector<vector<u8>> [
-                x"f09f98b7", // Cat face with tears of joy.
-                x"f09f", // Invalid emoji.
-            ],
-            vector[0, 1],
-        );
-    }
+    //     chat<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+    //         &get_signer(USER),
+    //         @black_cat_market,
+    //         vector<vector<u8>> [
+    //             x"f09f98b7", // Cat face with tears of joy.
+    //             x"f09f", // Invalid emoji.
+    //         ],
+    //         vector[0, 1],
+    //     );
+    // }
 
     // #[test, expected_failure(
     //     abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_INVALID_EMOJI_INDEX,
@@ -4140,10 +4140,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         chat<BlackCatEmojicoin, BlackCatEmojicoinLP>(
             &get_signer(USER),
             @black_cat_market,
-            vector[
-                x"f09f9088e2808de2ac9b", // Black cat.
-            ],
-            vector[0],
+          b"Hello"
         );
 
         // Verify the periodic state event.
@@ -4576,10 +4573,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         chat<BlackCatEmojicoin, BlackCatEmojicoinLP>(
             &get_signer(USER),
             @black_cat_market,
-            vector[
-                x"f09f9088e2808de2ac9b", // Black cat.
-            ],
-            vector[0],
+       b"Hello World"
         );
 
         // Get market cap, FDV of first market.
@@ -4628,10 +4622,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         chat<BlackCatEmojicoin, BlackCatEmojicoinLP>(
             &get_signer(USER),
             @black_cat_market,
-            vector[
-                x"f09f9088e2808de2ac9b", // Black cat.
-            ],
-            vector[0],
+          b"Hello World"
         );
 
         // Verify another global state event triggered.
