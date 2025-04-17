@@ -3,7 +3,7 @@ black_heart_market = "0xf4c8175ca990f11c733b43b9bad3bc4139908190b80d591ecfd40eba
 
 [dev-dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-core.git"
-rev = "aptos-cli-v7.2.0"
+rev = "main"
 subdir = "aptos-move/framework/aptos-framework"
 
 [package]

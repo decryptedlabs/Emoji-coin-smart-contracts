@@ -3,7 +3,7 @@ coin_factory = "_"
 
 [dev-dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-core.git"
-rev = "aptos-cli-v7.2.0"
+rev = "main"
 subdir = "aptos-move/framework/aptos-framework"
 
 [package]
