@@ -18,7 +18,7 @@
 
     use aptos_framework::account::{create_signer_for_test as get_signer};
     use aptos_framework::aggregator_v2::read_snapshot;
-    use aptos_framework::account;
+    // use aptos_framework::account;
     use aptos_framework::aptos_account;
     use aptos_framework::aptos_coin::AptosCoin;
     use aptos_framework::coin;
@@ -40,7 +40,7 @@
     };
     use emojicoin_dot_fun::emojicoin_dot_fun::{
         Self,
-        Chat,
+        // Chat,
         CumulativeStats,
         GlobalState,
         InstantaneousStats,
@@ -74,12 +74,12 @@
         get_EMOJICOIN_LP_NAME_SUFFIX,
         get_EMOJICOIN_LP_STRUCT_NAME,
         get_EMOJICOIN_LP_SYMBOL_PREFIX,
-        get_EMOJICOIN_NAME_SUFFIX,
+        // get_EMOJICOIN_NAME_SUFFIX,
         get_EMOJICOIN_REMAINDER,
         get_EMOJICOIN_SUPPLY,
         get_LP_TOKENS_INITIAL,
-        get_MAX_CHAT_MESSAGE_LENGTH,
-        get_MAX_SYMBOL_LENGTH,
+        // get_MAX_CHAT_MESSAGE_LENGTH,
+        // get_MAX_SYMBOL_LENGTH,
         get_MARKET_REGISTRATION_DEPOSIT,
         get_MARKET_REGISTRATION_FEE,
         get_MICROSECONDS_PER_SECOND,
@@ -105,9 +105,9 @@
         get_bps_fee_test_only as get_bps_fee,
         get_concatenation_test_only as get_concatenation,
         init_module_test_only as init_module,
-        is_a_supplemental_chat_emoji,
-        is_a_supported_chat_emoji,
-        is_a_supported_symbol_emoji,
+        // is_a_supplemental_chat_emoji,
+        // is_a_supported_chat_emoji,
+        // is_a_supported_symbol_emoji,
         market_view,
         market_metadata_by_emoji_bytes,
         market_metadata_by_market_address,
@@ -126,7 +126,7 @@
         swap,
         tvl_clamm_test_only as tvl_clamm,
         tvl_per_lp_coin_growth_q64,
-        unpack_chat,
+        // unpack_chat,
         unpack_cumulative_stats,
         unpack_global_state,
         unpack_instantaneous_stats,
@@ -146,12 +146,12 @@
         unpack_swap,
         unpack_tvl_to_lp_coin_ratio,
         valid_coin_types_test_only as valid_coin_types,
-        verified_symbol_emoji_bytes,
+        // verified_symbol_emoji_bytes,
     };
     use emojicoin_dot_fun::hex_codes::{
         get_metadata_bytes_test_only as get_metadata_bytes,
         get_split_module_bytes_test_only as get_split_module_bytes,
-        get_coin_symbol_emojis_test_only as get_coin_symbol_emojis,
+        // get_coin_symbol_emojis_test_only as get_coin_symbol_emojis,
         get_publish_code_test_only as get_publish_code,
     };
     use emojicoin_dot_fun::test_acquisitions::{
@@ -165,7 +165,8 @@
     };
     use std::bcs;
     use std::option;
-    use std::string::{Self, String, utf8};
+    // use std::string::{Self, String, utf8}; 
+    use std::string::{String, utf8}; 
     use std::type_info;
     use std::vector;
 
@@ -3284,7 +3285,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         timestamp::update_global_time_for_test(time);
         mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_DEPOSIT());
 
-                 register_market(&get_signer(USER), SAVE_CORAL_TITLE,SAVE_CORAL_SYMBOL, INTEGRATOR);
+                 register_market(&get_signer(USER), SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL, INTEGRATOR);
         let market_view = base_market_view();
         let market_metadata_1 = MockMarketMetadata {
             market_id: 1,
@@ -3341,7 +3342,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
 
         // Register new market, assert state.
         mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_FEE() + get_MARKET_REGISTRATION_DEPOSIT());
-       register_market_without_publish(&get_signer(USER), title, symbol, INTEGRATOR);
+       register_market_without_publish(&get_signer(USER), SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL, INTEGRATOR);
         let market_metadata_2 = MockMarketMetadata {
             market_id: 2,
             market_address: @black_heart_market,
@@ -3431,7 +3432,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         init_package();
         mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_DEPOSIT());
                  register_market(&get_signer(USER), SAVE_CORAL_TITLE,SAVE_CORAL_SYMBOL, INTEGRATOR);
-      register_market_without_publish(&get_signer(USER), title, symbol, INTEGRATOR);
+      register_market_without_publish(&get_signer(USER), SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL, INTEGRATOR);
     }
 
     // #[test] fun register_market_with_compound_emoji_sequence() {
@@ -4576,45 +4577,45 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
        b"Hello World"
         );
 
-//         // Get market cap, FDV of first market.
-//         let ( _, _, _, _, _, _, _, instantaneous_stats, _, _, _, _, _,) = unpack_market_view(
-//             market_view<BlackCatEmojicoin, BlackCatEmojicoinLP>(@black_cat_market)
-//         );
-//         let (_, _, market_cap_market_1, fdv_market_1) =
-//             unpack_instantaneous_stats(instantaneous_stats);
+        // Get market cap, FDV of first market.
+        let ( _, _, _, _, _, _, _, instantaneous_stats, _, _, _, _, _,) = unpack_market_view(
+            market_view<BlackCatEmojicoin, BlackCatEmojicoinLP>(@black_cat_market)
+        );
+        let (_, _, market_cap_market_1, fdv_market_1) =
+            unpack_instantaneous_stats(instantaneous_stats);
 
-//         // Verify two global state events triggered, one for publication and one for period lapse.
-//         let global_state_events = emitted_events<GlobalState>();
-//         assert!(vector::length(&global_state_events) == 2, 0);
-//         assert_global_state(
-//             MockGlobalState {
-//                 emit_time: get_PERIOD_1D(),
-//                 registry_nonce: 13,
-//                 trigger: get_TRIGGER_MARKET_REGISTRATION(),
-//                 cumulative_quote_volume: (
-//                     (exact_transition_swap_event.quote_volume as u128) +
-//                     (swap_buy_1_quote_volume as u128) +
-//                     (swap_sell_1_quote_volume as u128) +
-//                     (swap_buy_2_quote_volume as u128) +
-//                     (swap_sell_2_quote_volume as u128)
-//                 ),
-//                 total_quote_locked: (coin::balance<AptosCoin>(@black_cat_market) as u128),
-//                 total_value_locked: 2 * (coin::balance<AptosCoin>(@black_cat_market) as u128),
-//                 market_cap: market_cap_market_1,
-//                 fully_diluted_value:
-//                     ((fdv_market_1 + fdv_for_newly_registered_market()) as u128),
-//                 cumulative_integrator_fees: (
-//                     (swap_buy_1_integrator_fee as u128) +
-//                     (swap_sell_1_integrator_fee as u128) +
-//                     (swap_buy_2_integrator_fee as u128) +
-//                     (swap_sell_2_integrator_fee as u128) +
-//                     1 * (get_MARKET_REGISTRATION_FEE() as u128)
-//                 ),
-//                 cumulative_swaps: 5,
-//                 cumulative_chat_messages: 1,
-//             },
-//             vector::pop_back(&mut global_state_events),
-//         );
+        // Verify two global state events triggered, one for publication and one for period lapse.
+        let global_state_events = emitted_events<GlobalState>();
+        assert!(vector::length(&global_state_events) == 2, 0);
+        assert_global_state(
+            MockGlobalState {
+                emit_time: get_PERIOD_1D(),
+                registry_nonce: 13,
+                trigger: get_TRIGGER_MARKET_REGISTRATION(),
+                cumulative_quote_volume: (
+                    (exact_transition_swap_event.quote_volume as u128) +
+                    (swap_buy_1_quote_volume as u128) +
+                    (swap_sell_1_quote_volume as u128) +
+                    (swap_buy_2_quote_volume as u128) +
+                    (swap_sell_2_quote_volume as u128)
+                ),
+                total_quote_locked: (coin::balance<AptosCoin>(@black_cat_market) as u128),
+                total_value_locked: 2 * (coin::balance<AptosCoin>(@black_cat_market) as u128),
+                market_cap: market_cap_market_1,
+                fully_diluted_value:
+                    ((fdv_market_1 + fdv_for_newly_registered_market()) as u128),
+                cumulative_integrator_fees: (
+                    (swap_buy_1_integrator_fee as u128) +
+                    (swap_sell_1_integrator_fee as u128) +
+                    (swap_buy_2_integrator_fee as u128) +
+                    (swap_sell_2_integrator_fee as u128) +
+                    1 * (get_MARKET_REGISTRATION_FEE() as u128)
+                ),
+                cumulative_swaps: 5,
+                cumulative_chat_messages: 1,
+            },
+            vector::pop_back(&mut global_state_events),
+        );
 
         // Advance timer to next 1 day boundary, chat on original market.
         time = 2 * get_PERIOD_1D();
@@ -4625,166 +4626,166 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
           b"Hello World"
         );
 
-//         // Verify another global state event triggered.
-//         let global_state_events = emitted_events<GlobalState>();
-//         assert!(vector::length(&global_state_events) == 3, 0);
-//         assert_global_state(
-//             MockGlobalState {
-//                 emit_time: 2 * get_PERIOD_1D(),
-//                 registry_nonce: 15,
-//                 trigger: get_TRIGGER_CHAT(),
-//                 cumulative_quote_volume: (
-//                     (exact_transition_swap_event.quote_volume as u128) +
-//                     (swap_buy_1_quote_volume as u128) +
-//                     (swap_sell_1_quote_volume as u128) +
-//                     (swap_buy_2_quote_volume as u128) +
-//                     (swap_sell_2_quote_volume as u128)
-//                 ),
-//                 total_quote_locked: (coin::balance<AptosCoin>(@black_cat_market) as u128),
-//                 total_value_locked: 2 * (coin::balance<AptosCoin>(@black_cat_market) as u128),
-//                 market_cap: market_cap_market_1,
-//                 fully_diluted_value:
-//                     ((fdv_market_1 + 2 * fdv_for_newly_registered_market()) as u128),
-//                 cumulative_integrator_fees: (
-//                     (swap_buy_1_integrator_fee as u128) +
-//                     (swap_sell_1_integrator_fee as u128) +
-//                     (swap_buy_2_integrator_fee as u128) +
-//                     (swap_sell_2_integrator_fee as u128) +
-//                     2 * (get_MARKET_REGISTRATION_FEE() as u128)
-//                 ),
-//                 cumulative_swaps: 5,
-//                 cumulative_chat_messages: 2,
-//             },
-//             vector::pop_back(&mut global_state_events),
-//         );
+        // Verify another global state event triggered.
+        let global_state_events = emitted_events<GlobalState>();
+        assert!(vector::length(&global_state_events) == 3, 0);
+        assert_global_state(
+            MockGlobalState {
+                emit_time: 2 * get_PERIOD_1D(),
+                registry_nonce: 15,
+                trigger: get_TRIGGER_CHAT(),
+                cumulative_quote_volume: (
+                    (exact_transition_swap_event.quote_volume as u128) +
+                    (swap_buy_1_quote_volume as u128) +
+                    (swap_sell_1_quote_volume as u128) +
+                    (swap_buy_2_quote_volume as u128) +
+                    (swap_sell_2_quote_volume as u128)
+                ),
+                total_quote_locked: (coin::balance<AptosCoin>(@black_cat_market) as u128),
+                total_value_locked: 2 * (coin::balance<AptosCoin>(@black_cat_market) as u128),
+                market_cap: market_cap_market_1,
+                fully_diluted_value:
+                    ((fdv_market_1 + 2 * fdv_for_newly_registered_market()) as u128),
+                cumulative_integrator_fees: (
+                    (swap_buy_1_integrator_fee as u128) +
+                    (swap_sell_1_integrator_fee as u128) +
+                    (swap_buy_2_integrator_fee as u128) +
+                    (swap_sell_2_integrator_fee as u128) +
+                    2 * (get_MARKET_REGISTRATION_FEE() as u128)
+                ),
+                cumulative_swaps: 5,
+                cumulative_chat_messages: 2,
+            },
+            vector::pop_back(&mut global_state_events),
+        );
 
-//         // Verify that all periodic state trackers are triggered accordingly.
-//         let mock_periodic_state = MockPeriodicState {
-//             market_metadata: base_market_metadata(),
-//             periodic_state_metadata: MockPeriodicStateMetadata {
-//                 start_time: get_PERIOD_1D(),
-//                 period: 0,
-//                 emit_time: 2 * get_PERIOD_1D(),
-//                 emit_market_nonce: 12,
-//                 trigger: get_TRIGGER_CHAT(),
-//             },
-//             open_price_q64: 0,
-//             high_price_q64: 0,
-//             low_price_q64: 0,
-//             close_price_q64: 0,
-//             volume_base: 0,
-//             volume_quote: 0,
-//             integrator_fees: 0,
-//             pool_fees_base: 0,
-//             pool_fees_quote: 0,
-//             n_swaps: 0,
-//             n_chat_messages: 1,
-//             starts_in_bonding_curve: false,
-//             ends_in_bonding_curve: false,
-//             tvl_per_lp_coin_growth_q64: 1 << 64,
-//         };
-//         let periods = vector[
-//             get_PERIOD_1M(),
-//             get_PERIOD_5M(),
-//             get_PERIOD_15M(),
-//             get_PERIOD_30M(),
-//             get_PERIOD_1H(),
-//             get_PERIOD_4H(),
-//             get_PERIOD_1D(),
-//         ];
-//         let n_periods = vector::length(&periods);
-//         for (i in 0..n_periods) {
-//             // Push back 7 mock periodic state events into the ongoing mock events vector, so that
-//             // the check for the number of emitted events is correct. Earlier parts of this test
-//             // case already verified the associated periodic state trigger operations that inform
-//             // values in these mock periodic state events, so their values are not asserted here.
-//             // Rather, only the final 7 events are asserted below, representing the periodic state
-//             // trackers that were reset at the 1 day boundary, to verify that they are all identical
-//             // except for start time.
-//             vector::push_back(&mut mock_periodic_state_events, mock_periodic_state);
-//         };
-//         vector::for_each(periods, |period| {
-//             let new_periodic_state = copy mock_periodic_state;
-//             new_periodic_state.periodic_state_metadata.start_time = get_PERIOD_1D();
-//             new_periodic_state.periodic_state_metadata.period = period;
-//             vector::push_back(&mut mock_periodic_state_events, new_periodic_state);
-//         });
-//         assert_periodic_state_tail_cumulative(mock_periodic_state_events, n_periods);
-//     }
+        // Verify that all periodic state trackers are triggered accordingly.
+        let mock_periodic_state = MockPeriodicState {
+            market_metadata: base_market_metadata(),
+            periodic_state_metadata: MockPeriodicStateMetadata {
+                start_time: get_PERIOD_1D(),
+                period: 0,
+                emit_time: 2 * get_PERIOD_1D(),
+                emit_market_nonce: 12,
+                trigger: get_TRIGGER_CHAT(),
+            },
+            open_price_q64: 0,
+            high_price_q64: 0,
+            low_price_q64: 0,
+            close_price_q64: 0,
+            volume_base: 0,
+            volume_quote: 0,
+            integrator_fees: 0,
+            pool_fees_base: 0,
+            pool_fees_quote: 0,
+            n_swaps: 0,
+            n_chat_messages: 1,
+            starts_in_bonding_curve: false,
+            ends_in_bonding_curve: false,
+            tvl_per_lp_coin_growth_q64: 1 << 64,
+        };
+        let periods = vector[
+            get_PERIOD_1M(),
+            get_PERIOD_5M(),
+            get_PERIOD_15M(),
+            get_PERIOD_30M(),
+            get_PERIOD_1H(),
+            get_PERIOD_4H(),
+            get_PERIOD_1D(),
+        ];
+        let n_periods = vector::length(&periods);
+        for (i in 0..n_periods) {
+            // Push back 7 mock periodic state events into the ongoing mock events vector, so that
+            // the check for the number of emitted events is correct. Earlier parts of this test
+            // case already verified the associated periodic state trigger operations that inform
+            // values in these mock periodic state events, so their values are not asserted here.
+            // Rather, only the final 7 events are asserted below, representing the periodic state
+            // trackers that were reset at the 1 day boundary, to verify that they are all identical
+            // except for start time.
+            vector::push_back(&mut mock_periodic_state_events, mock_periodic_state);
+        };
+        vector::for_each(periods, |period| {
+            let new_periodic_state = copy mock_periodic_state;
+            new_periodic_state.periodic_state_metadata.start_time = get_PERIOD_1D();
+            new_periodic_state.periodic_state_metadata.period = period;
+            vector::push_back(&mut mock_periodic_state_events, new_periodic_state);
+        });
+        assert_periodic_state_tail_cumulative(mock_periodic_state_events, n_periods);
+    }
 
-//     #[test] fun tvl_clamm_expected() {
-//         assert_tvl_clamm(
-//             MockReserves{
-//                 base: get_BASE_VIRTUAL_CEILING(),
-//                 quote: get_QUOTE_VIRTUAL_FLOOR(),
-//             },
-//             0,
-//         );
+    #[test] fun tvl_clamm_expected() {
+        assert_tvl_clamm(
+            MockReserves{
+                base: get_BASE_VIRTUAL_CEILING(),
+                quote: get_QUOTE_VIRTUAL_FLOOR(),
+            },
+            0,
+        );
 
-//         let base_out = 10;
-//         let quote_in = 50;
-//         let reserves = MockReserves{
-//             base: get_BASE_VIRTUAL_CEILING() - base_out,
-//             quote: get_QUOTE_VIRTUAL_FLOOR() + quote_in,
-//         };
-//         let base_real_in_bonding_curve = get_BASE_REAL_CEILING() - base_out;
-//         let base_locked = base_real_in_bonding_curve + get_EMOJICOIN_REMAINDER();
-//         let base_denominated_in_quote =
-//             ((base_locked as u128) * (reserves.quote as u128)) / (reserves.base as u128);
-//         assert_tvl_clamm(
-//             reserves,
-//             (quote_in as u128) + base_denominated_in_quote,
-//         );
-//     }
+        let base_out = 10;
+        let quote_in = 50;
+        let reserves = MockReserves{
+            base: get_BASE_VIRTUAL_CEILING() - base_out,
+            quote: get_QUOTE_VIRTUAL_FLOOR() + quote_in,
+        };
+        let base_real_in_bonding_curve = get_BASE_REAL_CEILING() - base_out;
+        let base_locked = base_real_in_bonding_curve + get_EMOJICOIN_REMAINDER();
+        let base_denominated_in_quote =
+            ((base_locked as u128) * (reserves.quote as u128)) / (reserves.base as u128);
+        assert_tvl_clamm(
+            reserves,
+            (quote_in as u128) + base_denominated_in_quote,
+        );
+    }
 
-//     #[test] fun valid_coin_types_all_invalid() {
-//         // Duplicate types should be invalid.
-//         assert!(!valid_coin_types<BlackCatEmojicoin, BlackCatEmojicoin>(@emojicoin_dot_fun), 0);
-//         // Duplicate LP types should be invalid.
-//         assert!(!valid_coin_types<BlackCatEmojicoinLP, BlackCatEmojicoinLP>(@emojicoin_dot_fun), 0);
-//         // A bad Emojicoin type should be invalid.
-//         assert!(!valid_coin_types<BadType, BlackCatEmojicoinLP>(@emojicoin_dot_fun), 0);
-//         // A bad EmojicoinLP type should be invalid.
-//         assert!(!valid_coin_types<BlackCatEmojicoin, BadType>(@emojicoin_dot_fun), 0);
-//         // Backwards coin types that are otherwise valid should be invalid.
-//         assert!(!valid_coin_types<BlackCatEmojicoinLP, BlackCatEmojicoin>(@emojicoin_dot_fun), 0);
-//         // A market address that doesn't match the types should be invalid.
-//         assert!(!valid_coin_types<BlackCatEmojicoin, BlackCatEmojicoinLP>(@0xc1de), 0);
-//     }
+    #[test] fun valid_coin_types_all_invalid() {
+        // Duplicate types should be invalid.
+        assert!(!valid_coin_types<BlackCatEmojicoin, BlackCatEmojicoin>(@emojicoin_dot_fun), 0);
+        // Duplicate LP types should be invalid.
+        assert!(!valid_coin_types<BlackCatEmojicoinLP, BlackCatEmojicoinLP>(@emojicoin_dot_fun), 0);
+        // A bad Emojicoin type should be invalid.
+        assert!(!valid_coin_types<BadType, BlackCatEmojicoinLP>(@emojicoin_dot_fun), 0);
+        // A bad EmojicoinLP type should be invalid.
+        assert!(!valid_coin_types<BlackCatEmojicoin, BadType>(@emojicoin_dot_fun), 0);
+        // Backwards coin types that are otherwise valid should be invalid.
+        assert!(!valid_coin_types<BlackCatEmojicoinLP, BlackCatEmojicoin>(@emojicoin_dot_fun), 0);
+        // A market address that doesn't match the types should be invalid.
+        assert!(!valid_coin_types<BlackCatEmojicoin, BlackCatEmojicoinLP>(@0xc1de), 0);
+    }
 
-//     #[test] fun valid_coin_types_all_valid() {
-//         assert!(
-//             valid_coin_types<YellowHeartEmojicoin, YellowHeartEmojicoinLP>(@yellow_heart_market) &&
-//             valid_coin_types<BlackHeartEmojicoin, BlackHeartEmojicoinLP>(@black_heart_market) &&
-//             valid_coin_types<BlackCatEmojicoin, BlackCatEmojicoinLP>(@black_cat_market),
-//             0
-//         );
-//     }
+    #[test] fun valid_coin_types_all_valid() {
+        assert!(
+            valid_coin_types<YellowHeartEmojicoin, YellowHeartEmojicoinLP>(@yellow_heart_market) &&
+            valid_coin_types<BlackHeartEmojicoin, BlackHeartEmojicoinLP>(@black_heart_market) &&
+            valid_coin_types<BlackCatEmojicoin, BlackCatEmojicoinLP>(@black_cat_market),
+            0
+        );
+    }
 
-//     // #[test, expected_failure(
-//     //     abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_EMOJI_BYTES_EMPTY,
-//     //     location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     // )] fun verified_symbol_emoji_bytes_emoji_bytes_empty() {
-//     //     init_package();
-//     //     verified_symbol_emoji_bytes(vector[]);
-//     // }
+    // #[test, expected_failure(
+    //     abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_EMOJI_BYTES_EMPTY,
+    //     location = emojicoin_dot_fun::emojicoin_dot_fun,
+    // )] fun verified_symbol_emoji_bytes_emoji_bytes_empty() {
+    //     init_package();
+    //     verified_symbol_emoji_bytes(vector[]);
+    // }
 
-//     // #[test, expected_failure(
-//     //     abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_EMOJI_BYTES_TOO_LONG,
-//     //     location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     // )] fun verified_symbol_emoji_bytes_emoji_bytes_too_long() {
-//     //     init_package();
-//     //     verified_symbol_emoji_bytes(vector[
-//     //         x"f09f9088e2808de2ac9b", // Black cat.
-//     //         x"f09f9088e2808de2ac9b", // Black cat.
-//     //     ]);
-//     // }
+    // #[test, expected_failure(
+    //     abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_EMOJI_BYTES_TOO_LONG,
+    //     location = emojicoin_dot_fun::emojicoin_dot_fun,
+    // )] fun verified_symbol_emoji_bytes_emoji_bytes_too_long() {
+    //     init_package();
+    //     verified_symbol_emoji_bytes(vector[
+    //         x"f09f9088e2808de2ac9b", // Black cat.
+    //         x"f09f9088e2808de2ac9b", // Black cat.
+    //     ]);
+    // }
 
-//     // #[test, expected_failure(
-//     //     abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NOT_SUPPORTED_SYMBOL_EMOJI,
-//     //     location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     // )] fun verified_symbol_emoji_bytes_not_supported_symbol_emoji() {
-//     //     init_package();
-//     //     verified_symbol_emoji_bytes(vector[x"00"]);
-//     // }
+    // #[test, expected_failure(
+    //     abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NOT_SUPPORTED_SYMBOL_EMOJI,
+    //     location = emojicoin_dot_fun::emojicoin_dot_fun,
+    // )] fun verified_symbol_emoji_bytes_not_supported_symbol_emoji() {
+    //     init_package();
+    //     verified_symbol_emoji_bytes(vector[x"00"]);
+    // }
 }

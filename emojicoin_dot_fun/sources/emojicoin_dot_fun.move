@@ -757,7 +757,7 @@ public entry fun register_market(
     public entry fun chat<Emojicoin, EmojicoinLP>(
         user: &signer,
         market_address: address,
-        message: vector<u8>, 
+        message_bytes: vector<u8>, 
     ) acquires Market, Registry, RegistryAddress {
 
         // Mutably borrow market and check its coin types.
@@ -768,20 +768,12 @@ public entry fun register_market(
             market_address,
         );
 
-    // Verify chat message length.
-    let message_length = vector::length(&message);
+    // Verify chat message_bytes length.
+    let message_length = vector::length(&message_bytes);
     assert!(message_length <= MAX_CHAT_MESSAGE_LENGTH, E_CHAT_MESSAGE_TOO_LONG);
     assert!(message_length > 0, E_CHAT_MESSAGE_EMPTY);
 
-        // Construct the chat message from the emoji indices, checking index and emoji validity.
-        // let message: String = string::utf8(b"");
-        // let n_emojis = vector::length(&emoji_bytes);
-        // vector::for_each(emoji_indices_sequence, |idx| {
-        //     assert!((idx as u64) < n_emojis, E_INVALID_EMOJI_INDEX);
-        //     let emoji = *vector::borrow(&emoji_bytes, (idx as u64));
-        //     assert!(is_a_supported_chat_emoji(emoji), E_NOT_SUPPORTED_CHAT_EMOJI);
-        //     string::append_utf8(&mut message, emoji);
-        // });
+        let message: String = string::utf8(message_bytes);
 
         // Prep local variables.
         let user_address = signer::address_of(user);
