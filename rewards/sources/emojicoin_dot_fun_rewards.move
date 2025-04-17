@@ -68,7 +68,7 @@ module rewards::emojicoin_dot_fun_rewards {
     }
 
     #[randomness]
-    entry fun swap_with_rewards<Emojicoin, EmojicoinLP>(
+    entry fun swap_with_rewards<Movementcoin, MovementcoinLP>(
         swapper: &signer,
         market_address: address,
         input_amount: u64,
@@ -79,7 +79,7 @@ module rewards::emojicoin_dot_fun_rewards {
         // Simulate swap to get integrator fee, then execute swap.
         let swapper_address = signer::address_of(swapper);
         let swap =
-            emojicoin_dot_fun::simulate_swap<Emojicoin, EmojicoinLP>(
+            emojicoin_dot_fun::simulate_swap<Movementcoin, MovementcoinLP>(
                 swapper_address,
                 market_address,
                 input_amount,
@@ -89,7 +89,7 @@ module rewards::emojicoin_dot_fun_rewards {
             );
         let (_, _, _, _, _, _, _, _, _, _, _, _, integrator_fee_in_octas, _, _, _, _, _) =
             emojicoin_dot_fun::unpack_swap(swap);
-        emojicoin_dot_fun::swap<Emojicoin, EmojicoinLP>(
+        emojicoin_dot_fun::swap<Movementcoin, MovementcoinLP>(
             swapper,
             market_address,
             input_amount,

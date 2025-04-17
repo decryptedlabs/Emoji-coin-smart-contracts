@@ -36,3 +36,4 @@ Without Docker
 
 aptos move compile --dev
 aptos move test --dev
+aptos node run-local-testnet --with-faucet
