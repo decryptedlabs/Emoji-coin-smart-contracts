@@ -1124,14 +1124,14 @@ public entry fun register_market(
             cumulative_chat_messages,
         )
     }
-
+//TODO: market_metadata_by_emoji_bytes change this to market_metadata_by_symbol_bytes
     #[view]
-    public fun market_metadata_by_emoji_bytes(emoji_bytes: vector<u8>): Option<MarketMetadata>
+    public fun market_metadata_by_emoji_bytes(symbol: vector<u8>): Option<MarketMetadata>
     acquires Market, Registry, RegistryAddress {
         let registry_ref = borrow_registry_ref();
         let markets_by_emoji_bytes_ref = &registry_ref.markets_by_symbol;
-        if (smart_table::contains(markets_by_emoji_bytes_ref, emoji_bytes)) {
-            let market_address = *smart_table::borrow(markets_by_emoji_bytes_ref, emoji_bytes);
+        if (smart_table::contains(markets_by_emoji_bytes_ref, symbol)) {
+            let market_address = *smart_table::borrow(markets_by_emoji_bytes_ref, symbol);
             option::some(borrow_global<Market>(market_address).metadata)
         } else {
             option::none()

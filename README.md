@@ -1,3 +1,5 @@
+With Docker
+
 1. To build the image.
 sudo docker build -t aptos-cli .
 🔍 Breakdown:
@@ -20,3 +22,17 @@ sudo docker run -it --rm \
 3. To test the contracts.
 
 sudo docker run -it --rm -v "$PWD":/aptos -w /aptos/emojicoin_dot_fun aptos-cli move test
+
+
+For windows
+ 
+docker-compose up -d
+docker-compose exec aptos aptos move compile --dev
+docker-compose exec aptos aptos move test
+docker-compose down
+
+
+Without Docker
+
+aptos move compile --dev
+aptos move test --dev

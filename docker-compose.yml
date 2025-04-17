@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  aptos:
+    image: aptos-cli
+    container_name: aptos-cli
+    volumes:
+      - .:/aptos
+    working_dir: /aptos/emojicoin_dot_fun
+    tty: true           # Keeps the container running and allocates a pseudo-TTY
+    stdin_open: true    # Keeps STDIN open for interactive use
+    entrypoint: /bin/bash  # Start with bash so you can interact and run commands

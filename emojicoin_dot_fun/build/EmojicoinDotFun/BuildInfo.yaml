@@ -16,10 +16,10 @@ compiled_package_info:
     vm: "0000000000000000000000000000000000000000000000000000000000000000"
     vm_reserved: "0000000000000000000000000000000000000000000000000000000000000000"
     yellow_heart_market: c050f3cc6b85ef42a2fb3ab073f6343c32b19c3c25f876c8ab3eb2c07aca1972
-  source_digest: 97E531E2D1A817CE30DB90150DA9912A73EE1638EDBC00115028910490B2FCEA
+  source_digest: BBE914BA0682D82FA9A8997B2A6D0AA10DD10BD88927652BA3B2570BE6DA03E1
   build_flags:
     dev_mode: true
-    test_mode: false
+    test_mode: true
     override_std: ~
     generate_docs: false
     generate_abis: false
@@ -60,6 +60,9 @@ compiled_package_info:
 dependencies:
   - AptosFramework
   - AptosStdlib
+  - BlackCatCoinFactory
+  - BlackHeartCoinFactory
   - EmojicoinDotFunCoinFactory
   - MoveStdlib
+  - YellowHeartCoinFactory
 bytecode_deps: []
