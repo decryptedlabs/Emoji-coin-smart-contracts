@@ -449,7 +449,7 @@ public entry fun register_market(
         integrator: address,
         integrator_fee_rate_bps: u8,
         min_output_amount: u64,
-    ) acquires
+     ) acquires
         LPCoinCapabilities,
         Market,
         Registry,
@@ -547,15 +547,53 @@ public entry fun register_market(
                 *local_cumulative_pool_fees_quote_ref_mut + pool_fees_quote_as_u128;
 
         } else { // If buying, might need to buy through the state transition.
-
+       
             // Transfer funds.
             quote = coin::withdraw<AptosCoin>(swapper, input_amount);
+if (!coin::is_account_registered<AptosCoin>(market_address)) {
+    coin::register<AptosCoin>(&market_signer);
+};    
             coin::deposit(market_address, coin::extract(&mut quote, event.quote_volume));
             aptos_account::transfer_coins<Movementcoin>(
                 &market_signer,
                 swapper_address,
                 event.base_volume,
             );
+            
+// Withdraw quote from swapper (should succeed if registered)
+// debug::print<address>(&signer::address_of(swapper));
+// debug::print<u64>(&input_amount);
+
+// quote = coin::withdraw<AptosCoin>(swapper, input_amount);
+// debug::print<String>(&string::utf8(b"[SWAP] Withdrew quote from swapper"));
+
+// // Check if market_address is registered before deposit
+// let is_registered = coin::is_account_registered<AptosCoin>(market_address);
+// debug::print<String>(&string::utf8(b"[SWAP] Market registered for AptosCoin?"));
+// debug::print<bool>(&is_registered);
+
+// // Extract and deposit quote_volume into market_address
+// debug::print<u64>(&event.quote_volume);
+// if (!coin::is_account_registered<AptosCoin>(market_address)) {
+//     coin::register<AptosCoin>(&market_signer);
+// };
+// let to_deposit = coin::extract(&mut quote, event.quote_volume);
+// debug::print<u64>(&coin::value(&to_deposit));
+
+
+// debug::print<String>(&string::utf8(b"[SWAP] About to deposit to market"));
+// coin::deposit(market_address, to_deposit);
+
+// debug::print<String>(&string::utf8(b"[SWAP] Deposit successful"));
+
+// // Transfer base volume of Movementcoin to swapper
+// debug::print<u64>(&event.base_volume);
+// aptos_account::transfer_coins<Movementcoin>(
+//     &market_signer,
+//     swapper_address,
+//     event.base_volume,
+// );
+// debug::print<String>(&string::utf8(b"[SWAP] Movementcoin transferred"));
 
             if (results_in_state_transition) { // Buy with state transition.
                 // Mint initial liquidity provider coins.
@@ -1699,9 +1737,10 @@ let integrator_fee = fee;
         integrator: address,
         integrator_fee_rate_bps: u8,
         market_ref: &Market,
-    ): Swap {
+     ): Swap {
         // Sanitize inputs, ensure coin types initialized.
         assert!(input_amount > 0, E_SWAP_INPUT_ZERO);
+       
         ensure_coins_initialized<Movementcoin, MovementcoinLP>(
             market_ref,
             &object::generate_signer_for_extending(&market_ref.extend_ref),
@@ -2017,7 +2056,8 @@ let integrator_fee = fee;
         let market_extend_ref = object::generate_extend_ref(&market_constructor_ref);
         let market_id = 1 + smart_table::length(markets_by_symbol_ref_mut);
         // Only assess integrator fees for markets after the first.
-        let integrator_fees = if (market_id == 1) 0 else (MARKET_REGISTRATION_FEE as u128);
+        // let integrator_fees = if (market_id == 1) 0 else (MARKET_REGISTRATION_FEE as u128); 
+        let integrator_fees = MARKET_REGISTRATION_FEE as u128; 
 
         let time = timestamp::now_microseconds();
         move_to(&market_signer, Market {
@@ -2561,6 +2601,7 @@ let integrator_fee = fee;
     }
 
     inline fun valid_coin_types<Movementcoin, MovementcoinLP>(market_address: address): bool {
+
         let emoji_type = &type_info::type_of<Movementcoin>();
         let lp_type = &type_info::type_of<MovementcoinLP>();
         type_info::account_address(emoji_type) == market_address    &&
