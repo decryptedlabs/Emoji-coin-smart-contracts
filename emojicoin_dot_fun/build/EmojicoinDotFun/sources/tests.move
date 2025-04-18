@@ -109,7 +109,7 @@
         // is_a_supported_chat_emoji,
         // is_a_supported_symbol_emoji,
         market_view,
-        market_metadata_by_emoji_bytes,
+        market_metadata_by_symbol_bytes,
         market_metadata_by_market_address,
         market_metadata_by_market_id,
         pack_reserves,
@@ -1674,7 +1674,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         symbol: vector<u8>,
     ): MarketMetadata {
          option::destroy_some(
-            market_metadata_by_emoji_bytes(symbol)
+            market_metadata_by_symbol_bytes(symbol)
         )
     }
 
@@ -2738,7 +2738,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         init_package();
 
         // Assert all metadata empty before market is registered.
-        assert!(market_metadata_by_emoji_bytes(SAVE_CORAL_SYMBOL) == option::none(), 0);
+        assert!(market_metadata_by_symbol_bytes(SAVE_CORAL_SYMBOL) == option::none(), 0);
         assert!(market_metadata_by_market_address(@black_cat_market) == option::none(), 0);
         assert!(market_metadata_by_market_id(1) == option::none(), 0);
 
@@ -2752,7 +2752,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         };
         assert_market_metadata(
             mock_market_metadata,
-            option::destroy_some(market_metadata_by_emoji_bytes(SAVE_CORAL_SYMBOL)),
+            option::destroy_some(market_metadata_by_symbol_bytes(SAVE_CORAL_SYMBOL)),
         );
         assert_market_metadata(
             mock_market_metadata,
@@ -3462,10 +3462,10 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
 //     //     let concatenated_bytes = verified_symbol_emoji_bytes(emojis);
 
 //     //     // Verify market is not already registered, register, then verify is registered.
-//     //     assert!(market_metadata_by_emoji_bytes(concatenated_bytes) == option::none(), 0);
+//     //     assert!(market_metadata_by_symbol_bytes(concatenated_bytes) == option::none(), 0);
 //     //      init_market(b"End Hunger", b"EH");
 //     //     let market_metadata =
-//     //         option::destroy_some(market_metadata_by_emoji_bytes(concatenated_bytes));
+//     //         option::destroy_some(market_metadata_by_symbol_bytes(concatenated_bytes));
 //     //     let (_, _, market_metadata_byes) = unpack_market_metadata(market_metadata);
 //     //     assert!(market_metadata_byes == concatenated_bytes, 0);
 //     // }

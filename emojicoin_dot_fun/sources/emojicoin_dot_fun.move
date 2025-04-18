@@ -1156,9 +1156,9 @@ if (!coin::is_account_registered<AptosCoin>(market_address)) {
             cumulative_chat_messages,
         )
     }
-//TODO: market_metadata_by_emoji_bytes change this to market_metadata_by_symbol_bytes
+//TODO: market_metadata_by_symbol_bytes change this to market_metadata_by_symbol_bytes
     #[view]
-    public fun market_metadata_by_emoji_bytes(symbol: vector<u8>): Option<MarketMetadata>
+    public fun market_metadata_by_symbol_bytes(symbol: vector<u8>): Option<MarketMetadata>
     acquires Market, Registry, RegistryAddress {
         let registry_ref = borrow_registry_ref();
         let markets_by_emoji_bytes_ref = &registry_ref.markets_by_symbol;
