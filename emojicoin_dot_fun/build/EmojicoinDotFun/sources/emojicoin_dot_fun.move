@@ -424,14 +424,6 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
         lp_coins: u128,
     }
 
-    // public entry fun register_market(
-    //     registrant: &signer,
-    //     emojis: vector<vector<u8>>,
-    //     integrator: address,
-    // ) acquires Market, Registry, RegistryAddress {
-    //     register_market_inner(registrant, emojis, integrator, true);
-    // }
-
 public entry fun register_market(
     registrant: &signer,
     title: vector<u8>,
@@ -560,41 +552,6 @@ if (!coin::is_account_registered<AptosCoin>(market_address)) {
                 event.base_volume,
             );
             
-// Withdraw quote from swapper (should succeed if registered)
-// debug::print<address>(&signer::address_of(swapper));
-// debug::print<u64>(&input_amount);
-
-// quote = coin::withdraw<AptosCoin>(swapper, input_amount);
-// debug::print<String>(&string::utf8(b"[SWAP] Withdrew quote from swapper"));
-
-// // Check if market_address is registered before deposit
-// let is_registered = coin::is_account_registered<AptosCoin>(market_address);
-// debug::print<String>(&string::utf8(b"[SWAP] Market registered for AptosCoin?"));
-// debug::print<bool>(&is_registered);
-
-// // Extract and deposit quote_volume into market_address
-// debug::print<u64>(&event.quote_volume);
-// if (!coin::is_account_registered<AptosCoin>(market_address)) {
-//     coin::register<AptosCoin>(&market_signer);
-// };
-// let to_deposit = coin::extract(&mut quote, event.quote_volume);
-// debug::print<u64>(&coin::value(&to_deposit));
-
-
-// debug::print<String>(&string::utf8(b"[SWAP] About to deposit to market"));
-// coin::deposit(market_address, to_deposit);
-
-// debug::print<String>(&string::utf8(b"[SWAP] Deposit successful"));
-
-// // Transfer base volume of Movementcoin to swapper
-// debug::print<u64>(&event.base_volume);
-// aptos_account::transfer_coins<Movementcoin>(
-//     &market_signer,
-//     swapper_address,
-//     event.base_volume,
-// );
-// debug::print<String>(&string::utf8(b"[SWAP] Movementcoin transferred"));
-
             if (results_in_state_transition) { // Buy with state transition.
                 // Mint initial liquidity provider coins.
                 let lp_coins =
@@ -1156,7 +1113,7 @@ if (!coin::is_account_registered<AptosCoin>(market_address)) {
             cumulative_chat_messages,
         )
     }
-//TODO: market_metadata_by_symbol_bytes change this to market_metadata_by_symbol_bytes
+
     #[view]
     public fun market_metadata_by_symbol_bytes(symbol: vector<u8>): Option<MarketMetadata>
     acquires Market, Registry, RegistryAddress {
@@ -1677,6 +1634,7 @@ let fee = MARKET_REGISTRATION_FEE;
 let can_pay_fee =
     coin::is_account_registered<AptosCoin>(registrant_address) &&
     coin::balance<AptosCoin>(registrant_address) >= fee;
+    
 assert!(can_pay_fee, E_UNABLE_TO_PAY_MARKET_REGISTRATION_FEE);
 aptos_account::transfer(registrant, integrator, fee);
 

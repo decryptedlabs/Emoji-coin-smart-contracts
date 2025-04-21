@@ -15,7 +15,7 @@
 //
 // cspell:word EINSUFFICIENT_BALANCE
 #[test_only] module emojicoin_dot_fun::tests {
-    use aptos_std::debug::print;
+    // use aptos_std::debug::print;
     use aptos_framework::account::{create_signer_for_test as get_signer};
     use aptos_framework::aggregator_v2::read_snapshot;
     // use aptos_framework::account;
@@ -440,6 +440,10 @@
     const YELLOW_HEART: vector<u8> = x"f09f929b";
 const SAVE_CORAL_TITLE: vector<u8> = b"Save Coral";
 const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
+const STOP_WAR_TITLE: vector<u8> = b"Stop War";
+const STOP_WAR_SYMBOL: vector<u8> = b"SW";
+const END_HUNGER_TITLE: vector<u8> = b"End Hunger";
+const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     // Polarity based on `is_sell` argument for swap functions in main file.
     const SWAP_BUY: bool = false;
     const SWAP_SELL: bool = true;
@@ -774,6 +778,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         assert!(close_price_q64 == mock_periodic_state.close_price_q64, 0);
         assert!(volume_base == mock_periodic_state.volume_base, 0);
         assert!(volume_quote == mock_periodic_state.volume_quote, 0);
+
         assert!(integrator_fees == mock_periodic_state.integrator_fees, 0);
         assert!(pool_fees_base == mock_periodic_state.pool_fees_base, 0);
         assert!(pool_fees_quote == mock_periodic_state.pool_fees_quote, 0);
@@ -893,7 +898,6 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         assert!(read_snapshot(&total_value_locked) == mock_registry_view.total_value_locked, 0);
         assert!(read_snapshot(&market_cap) == mock_registry_view.market_cap, 0);
         assert!(read_snapshot(&fully_diluted_value) == mock_registry_view.fully_diluted_value, 0);
-
         assert!(read_snapshot(&cumulative_integrator_fees)
             == mock_registry_view.cumulative_integrator_fees, 0);
         assert!(read_snapshot(&cumulative_swaps) == mock_registry_view.cumulative_swaps, 0);
@@ -1078,7 +1082,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         MockCumulativeStats {
             base_volume: 0,
             quote_volume: 0,
-            integrator_fees: 100000000,
+            integrator_fees: get_MARKET_REGISTRATION_DEPOSIT() as u128,
             pool_fees_base: 0,
             pool_fees_quote: 0,
             n_swaps: 0,
@@ -1091,7 +1095,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         MockCumulativeStats {
             base_volume: (swap.base_volume as u128),
             quote_volume: (swap.quote_volume as u128),
-            integrator_fees: (swap.integrator_fee as u128),
+            integrator_fees: (swap.integrator_fee as u128) + (get_MARKET_REGISTRATION_DEPOSIT() as u128),
             pool_fees_base: 0,
             pool_fees_quote: 0,
             n_swaps: 1,
@@ -1103,7 +1107,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         MockCumulativeStats {
             base_volume: (get_BASE_REAL_CEILING() as u128),
             quote_volume: (get_QUOTE_REAL_CEILING() as u128),
-            integrator_fees: 100000000,
+            integrator_fees: get_MARKET_REGISTRATION_DEPOSIT() as u128,
             pool_fees_base: 0,
             pool_fees_quote: 0,
             n_swaps: 1,
@@ -1289,7 +1293,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
             close_price_q64: 0,
             volume_base: 0,
             volume_quote: 0,
-            integrator_fees: 100000000,
+            integrator_fees: get_MARKET_REGISTRATION_DEPOSIT() as u128,
             pool_fees_base: 0,
             pool_fees_quote: 0,
             n_swaps: 0,
@@ -1310,7 +1314,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         periodic_state_tracker.close_price_q64 = swap.avg_execution_price_q64;
         periodic_state_tracker.volume_base = (swap.base_volume as u128);
         periodic_state_tracker.volume_quote = (swap.quote_volume as u128);
-        periodic_state_tracker.integrator_fees = (swap.integrator_fee as u128);
+        periodic_state_tracker.integrator_fees = (swap.integrator_fee as u128) + (get_MARKET_REGISTRATION_DEPOSIT() as u128);
         periodic_state_tracker.n_swaps = 1;
         periodic_state_tracker.tvl_to_lp_coin_ratio_end = base_tvl_to_lp_coin_ratio_simple_buy();
         periodic_state_tracker
@@ -1325,7 +1329,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         periodic_state_tracker.close_price_q64 = swap.avg_execution_price_q64;
         periodic_state_tracker.volume_base = (swap.base_volume as u128);
         periodic_state_tracker.volume_quote = (swap.quote_volume as u128);
-        periodic_state_tracker.integrator_fees = 100000000;
+        periodic_state_tracker.integrator_fees = get_MARKET_REGISTRATION_DEPOSIT() as u128;
         periodic_state_tracker.ends_in_bonding_curve = false;
         periodic_state_tracker.tvl_to_lp_coin_ratio_end =
             base_tvl_to_lp_coin_ratio_exact_transition();
@@ -1362,7 +1366,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
             total_value_locked: instantaneous_stats.total_value_locked,
             market_cap: instantaneous_stats.market_cap,
             fully_diluted_value: instantaneous_stats.fully_diluted_value,
-            cumulative_integrator_fees: (swap.integrator_fee as u128),
+            cumulative_integrator_fees: (swap.integrator_fee as u128) + (get_MARKET_REGISTRATION_DEPOSIT() as u128),
             cumulative_swaps: 1,
             cumulative_chat_messages: 0,
         }
@@ -1381,7 +1385,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
             total_value_locked: instantaneous_stats.total_value_locked,
             market_cap: instantaneous_stats.market_cap,
             fully_diluted_value: instantaneous_stats.fully_diluted_value,
-            cumulative_integrator_fees: 0,
+            cumulative_integrator_fees: get_MARKET_REGISTRATION_DEPOSIT() as u128,
             cumulative_swaps: 1,
             cumulative_chat_messages: 0,
         }
@@ -1575,8 +1579,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         // let registry_view = registry_view();
         // let (_, _, _, n_markets, _, _, _, _, _, _, _, _,) = unpack_registry_view(registry_view);
         // if (n_markets > 0)
-        mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_FEE());
-        mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_DEPOSIT());
+        mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_FEE() + get_MARKET_REGISTRATION_DEPOSIT());
        register_market_without_publish(&get_signer(USER), title, symbol, INTEGRATOR);
     }
 
@@ -1716,7 +1719,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
                 true,
             )
         } else {
-          
+
             init_package_then_exact_transition();
             (
                 base_swap_exact_transition(),
@@ -1737,6 +1740,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
                 flow.input_amount
             );
         } else {
+
             mint_aptos_coin_to(USER, flow.input_amount);
         };
 
@@ -1990,8 +1994,7 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         };
         assert!(coin::balance<BlackCatEmojicoin>(USER) == user_emojicoin_balance, 0);
         assert!(coin::balance<AptosCoin>(USER) == user_apt_balance, 0);
-        assert!(coin::balance<AptosCoin>(INTEGRATOR) == mock_swap.integrator_fee, 0);
-
+        assert!(coin::balance<AptosCoin>(INTEGRATOR) == mock_swap.integrator_fee + get_MARKET_REGISTRATION_DEPOSIT(), 0);
         // Assert market and registry views, emitted state event.
         assert_market_view(
             mock_market_view,
@@ -2274,8 +2277,8 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         location = emojicoin_dot_fun
     )] fun assert_valid_coin_types_bad_types() {
         init_package();
-        init_market(b"Stop War", b"SW");
-        
+        init_market( STOP_WAR_TITLE, STOP_WAR_SYMBOL);
+               
         assert_valid_coin_types<BadType, BadType>(@yellow_heart_market);
     }
 
@@ -2563,13 +2566,13 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
             b"LP-1",
         );
         assert_coin_name_and_symbol<BlackHeartEmojicoin, BlackHeartEmojicoinLP>(
-            b"Stop War",
-            b"SW",
+        STOP_WAR_TITLE,
+        STOP_WAR_SYMBOL,
             b"LP-2",
         );
         assert_coin_name_and_symbol<YellowHeartEmojicoin, YellowHeartEmojicoinLP>(
-            b"End Hunger",
-            b"EH",
+           END_HUNGER_TITLE,
+        END_HUNGER_SYMBOL,
             b"LP-3",
         );
     }
@@ -2606,16 +2609,16 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
     );
 
     assert_test_market_address(
-              b"Stop War",
-            b"SW",
+          STOP_WAR_TITLE,
+          STOP_WAR_SYMBOL,
         @black_heart_market,
         false
         // true
     );
 
     assert_test_market_address(
-           b"End Hunger",
-            b"EH",
+        END_HUNGER_TITLE,
+        END_HUNGER_SYMBOL,
         @yellow_heart_market,
         false
     );
@@ -3277,481 +3280,485 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
         register_market(&get_signer(USER), SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL, INTEGRATOR);
     }
 
-    // #[test] fun register_market_comprehensive_state_assertion() {
+    #[test] fun register_market_comprehensive_state_assertion() {
 
-    //     // Initialize module with nonzero time that truncates for some periods.
-    //     timestamp::set_time_has_started_for_testing(&get_signer(@aptos_framework));
-    //     let one_day_and_one_hour = get_PERIOD_1D() + get_PERIOD_1H();
-    //     let time = one_day_and_one_hour;
-    //     timestamp::update_global_time_for_test(time);
-    //     init_module(&get_signer(@emojicoin_dot_fun));
-    //     ensure_aptos_coin_capability_store_initialized();
+        // Initialize module with nonzero time that truncates for some periods.
+        timestamp::set_time_has_started_for_testing(&get_signer(@aptos_framework));
+        let one_day_and_one_hour = get_PERIOD_1D() + get_PERIOD_1H();
+        let time = one_day_and_one_hour;
+        timestamp::update_global_time_for_test(time);
+        init_module(&get_signer(@emojicoin_dot_fun));
+        ensure_aptos_coin_capability_store_initialized();
 
-    //     // Assert registry view.
-    //     let registry_view = base_registry_view();
-    //     registry_view.nonce = 1;
-    //     registry_view.last_bump_time = get_PERIOD_1D();
-    //     registry_view.n_markets = 0;
-    //     assert_registry_view(
-    //         registry_view,
-    //         registry_view(),
-    //     );
+        // Assert registry view.
+        let registry_view = base_registry_view();
+        registry_view.nonce = 1;
+        registry_view.last_bump_time = get_PERIOD_1D();
+        registry_view.n_markets = 0;
+        assert_registry_view(
+            registry_view,
+            registry_view(),
+        );
+        
 
-    //     // Register simple market one second later, assert market state.
-    //     let market_1_registration_time = time + get_MICROSECONDS_PER_SECOND();
-    //     time = market_1_registration_time;
-    //     timestamp::update_global_time_for_test(time);
-    //     mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_DEPOSIT() + get_MARKET_REGISTRATION_DEPOSIT());
+        // Register simple market one second later, assert market state.
+        let market_1_registration_time = time + get_MICROSECONDS_PER_SECOND();
+        time = market_1_registration_time;
+        timestamp::update_global_time_for_test(time);
+        mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_DEPOSIT() + get_MARKET_REGISTRATION_DEPOSIT());
 
-    //              register_market(&get_signer(USER), SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL, INTEGRATOR);
-    //     let market_view = base_market_view();
-    //     let market_metadata_1 = MockMarketMetadata {
-    //         market_id: 1,
-    //         market_address: @black_cat_market,
-    //                   title: SAVE_CORAL_TITLE, 
-    //         symbol: SAVE_CORAL_SYMBOL
-    //     };
-    //     market_view.metadata = market_metadata_1;
-    //     market_view.sequence_info.last_bump_time = time;
-    //     apply_periodic_state_tracker_start_times(
-    //         &mut market_view.periodic_state_trackers,
-    //         PeriodicStateTrackerStartTimes {
-    //             period_1D: get_PERIOD_1D(),
-    //             period_4H: get_PERIOD_1D(),
-    //             period_1H: one_day_and_one_hour,
-    //             period_30M: one_day_and_one_hour,
-    //             period_15M: one_day_and_one_hour,
-    //             period_5M: one_day_and_one_hour,
-    //             period_1M: one_day_and_one_hour,
-    //         }
-    //     );
-    //     assert_market_view(
-    //         market_view,
-    //         market_view<BlackCatEmojicoin, BlackCatEmojicoinLP>(@black_cat_market),
-    //     );
+                 register_market(&get_signer(USER), SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL, INTEGRATOR);
+        let market_view = base_market_view();
+        let market_metadata_1 = MockMarketMetadata {
+            market_id: 1,
+            market_address: @black_cat_market,
+                      title: SAVE_CORAL_TITLE, 
+            symbol: SAVE_CORAL_SYMBOL
+        };
+        market_view.metadata = market_metadata_1;
+        market_view.sequence_info.last_bump_time = time;
+        apply_periodic_state_tracker_start_times(
+            &mut market_view.periodic_state_trackers,
+            PeriodicStateTrackerStartTimes {
+                period_1D: get_PERIOD_1D(),
+                period_4H: get_PERIOD_1D(),
+                period_1H: one_day_and_one_hour,
+                period_30M: one_day_and_one_hour,
+                period_15M: one_day_and_one_hour,
+                period_5M: one_day_and_one_hour,
+                period_1M: one_day_and_one_hour,
+            }
+        );
+        assert_market_view(
+            market_view,
+            market_view<BlackCatEmojicoin, BlackCatEmojicoinLP>(@black_cat_market),
+        );
 
-    //     // Assert registry view.
-    //     registry_view.nonce = 2;
-    //     registry_view.n_markets = 1;
-    //     registry_view.fully_diluted_value = fdv_for_newly_registered_market();
-    //     assert_registry_view(
-    //         registry_view,
-    //         registry_view(),
-    //     );
+        // Assert registry view.
+        registry_view.nonce = 2;
+        registry_view.n_markets = 1;
+        registry_view.fully_diluted_value = fdv_for_newly_registered_market();
+        registry_view.cumulative_integrator_fees = (get_MARKET_REGISTRATION_FEE() as u128);
+        assert_registry_view(
+            registry_view,
+            registry_view(),
+        );
 
-    //     // Set next market registration time such that all periodic state trackers will truncate
-    //     // to last period boundary.
-    //     let market_2_registration_time = get_PERIOD_1D() + get_PERIOD_4H() + get_PERIOD_1H() +
-    //         get_PERIOD_30M() + get_PERIOD_15M() + get_PERIOD_5M() + get_PERIOD_1M() + 1;
-    //     let time = market_2_registration_time;
-    //     let periodic_state_tracker_start_times = PeriodicStateTrackerStartTimes {
-    //         period_1D: get_PERIOD_1D(),
-    //         period_4H: get_PERIOD_1D() + get_PERIOD_4H(),
-    //         period_1H: get_PERIOD_1D() + get_PERIOD_4H() + get_PERIOD_1H(),
-    //         period_30M: get_PERIOD_1D() + get_PERIOD_4H() + get_PERIOD_1H() + get_PERIOD_30M(),
-    //         period_15M: get_PERIOD_1D() + get_PERIOD_4H() + get_PERIOD_1H() + get_PERIOD_30M() +
-    //             get_PERIOD_15M(),
-    //         period_5M: get_PERIOD_1D() + get_PERIOD_4H() + get_PERIOD_1H() + get_PERIOD_30M() +
-    //             get_PERIOD_15M() + get_PERIOD_5M(),
-    //         period_1M: get_PERIOD_1D() + get_PERIOD_4H() + get_PERIOD_1H() + get_PERIOD_30M() +
-    //             get_PERIOD_15M() + get_PERIOD_5M() + get_PERIOD_1M(),
-    //     };
-    //     timestamp::update_global_time_for_test(time);
+        // Set next market registration time such that all periodic state trackers will truncate
+        // to last period boundary.
+        let market_2_registration_time = get_PERIOD_1D() + get_PERIOD_4H() + get_PERIOD_1H() +
+            get_PERIOD_30M() + get_PERIOD_15M() + get_PERIOD_5M() + get_PERIOD_1M() + 1;
+        let time = market_2_registration_time;
+        let periodic_state_tracker_start_times = PeriodicStateTrackerStartTimes {
+            period_1D: get_PERIOD_1D(),
+            period_4H: get_PERIOD_1D() + get_PERIOD_4H(),
+            period_1H: get_PERIOD_1D() + get_PERIOD_4H() + get_PERIOD_1H(),
+            period_30M: get_PERIOD_1D() + get_PERIOD_4H() + get_PERIOD_1H() + get_PERIOD_30M(),
+            period_15M: get_PERIOD_1D() + get_PERIOD_4H() + get_PERIOD_1H() + get_PERIOD_30M() +
+                get_PERIOD_15M(),
+            period_5M: get_PERIOD_1D() + get_PERIOD_4H() + get_PERIOD_1H() + get_PERIOD_30M() +
+                get_PERIOD_15M() + get_PERIOD_5M(),
+            period_1M: get_PERIOD_1D() + get_PERIOD_4H() + get_PERIOD_1H() + get_PERIOD_30M() +
+                get_PERIOD_15M() + get_PERIOD_5M() + get_PERIOD_1M(),
+        };
+        timestamp::update_global_time_for_test(time);
 
-    //     // Register new market, assert state.
-    //     mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_FEE() + get_MARKET_REGISTRATION_DEPOSIT());
-    //    register_market_without_publish(&get_signer(USER), SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL, INTEGRATOR);
-    //     let market_metadata_2 = MockMarketMetadata {
-    //         market_id: 2,
-    //         market_address: @black_heart_market,
-    //                    title: SAVE_CORAL_TITLE, 
-    //         symbol: SAVE_CORAL_SYMBOL
-    //     };
-    //     market_view.metadata = market_metadata_2;
-    //     market_view.sequence_info.last_bump_time = time;
-    //     market_view.cumulative_stats.integrator_fees = (get_MARKET_REGISTRATION_FEE() as u128);
-    //     apply_periodic_state_tracker_start_times(
-    //         &mut market_view.periodic_state_trackers,
-    //         periodic_state_tracker_start_times,
-    //     );
-    //     vector::for_each_mut(&mut market_view.periodic_state_trackers, |e| {
-    //         let periodic_state_tracker_ref_mut: &mut MockPeriodicStateTracker = e;
-    //         periodic_state_tracker_ref_mut.integrator_fees =
-    //             (get_MARKET_REGISTRATION_FEE() as u128);
-    //     });
-    //     assert_market_view(
-    //         market_view,
-    //         market_view<BlackHeartEmojicoin, BlackHeartEmojicoinLP>(@black_heart_market),
-    //     );
+        // Register new market, assert state.
+        mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_FEE() + get_MARKET_REGISTRATION_DEPOSIT());
+       register_market_without_publish(&get_signer(USER), STOP_WAR_TITLE, STOP_WAR_SYMBOL, INTEGRATOR);
+        let market_metadata_2 = MockMarketMetadata {
+            market_id: 2,
+            market_address: @black_heart_market,
+                       title: STOP_WAR_TITLE, 
+            symbol: STOP_WAR_SYMBOL
+        };
+        market_view.metadata = market_metadata_2;
+        market_view.sequence_info.last_bump_time = time;
+        market_view.cumulative_stats.integrator_fees = (get_MARKET_REGISTRATION_FEE() as u128);
+        apply_periodic_state_tracker_start_times(
+            &mut market_view.periodic_state_trackers,
+            periodic_state_tracker_start_times,
+        );
+        vector::for_each_mut(&mut market_view.periodic_state_trackers, |e| {
+            let periodic_state_tracker_ref_mut: &mut MockPeriodicStateTracker = e;
+            periodic_state_tracker_ref_mut.integrator_fees =
+                (get_MARKET_REGISTRATION_FEE() as u128);
+        });
+        assert_market_view(
+            market_view,
+            market_view<BlackHeartEmojicoin, BlackHeartEmojicoinLP>(@black_heart_market),
+        );
 
-    //     // Assert registry view.
-    //     registry_view.nonce = 3;
-    //     registry_view.n_markets = 2;
-    //     registry_view.fully_diluted_value = 2 * fdv_for_newly_registered_market();
-    //     registry_view.cumulative_integrator_fees = (get_MARKET_REGISTRATION_FEE() as u128);
-    //     assert_registry_view(
-    //         registry_view,
-    //         registry_view(),
-    //     );
+        // Assert registry view.
+        registry_view.nonce = 3;
+        registry_view.n_markets = 2;
+        registry_view.fully_diluted_value = 2 * fdv_for_newly_registered_market();
+        registry_view.cumulative_integrator_fees += (get_MARKET_REGISTRATION_FEE() as u128);
+        assert_registry_view(
+            registry_view,
+            registry_view(),
+        );
 
-    //     // Assert only one global state event emitted (from package publication).
-    //     assert!(vector::length(&emitted_events<GlobalState>()) == 1, 0);
+        // Assert only one global state event emitted (from package publication).
+        assert!(vector::length(&emitted_events<GlobalState>()) == 1, 0);
 
-    //     // Assert no periodic state events emitted.
-    //     assert!(vector::is_empty(&emitted_events<PeriodicState>()), 0);
+        // Assert no periodic state events emitted.
+        assert!(vector::is_empty(&emitted_events<PeriodicState>()), 0);
 
-    //     // Assert market registration events.
-    //     let market_registration_1 = base_market_registration();
-    //     market_registration_1.market_metadata = market_metadata_1;
-    //     market_registration_1.time = market_1_registration_time;
-    //     let market_registration_2 = base_market_registration();
-    //     market_registration_2.market_metadata = market_metadata_2;
-    //     market_registration_2.time = market_2_registration_time;
-    //     market_registration_2.integrator_fee = get_MARKET_REGISTRATION_FEE();
-    //     let market_registration_events = emitted_events<MarketRegistration>();
-    //     assert!(vector::length(&market_registration_events) == 2, 0);
-    //     assert_market_registration(
-    //         market_registration_1,
-    //         *vector::borrow(&market_registration_events, 0),
-    //     );
-    //     assert_market_registration(
-    //         market_registration_2,
-    //         *vector::borrow(&market_registration_events, 1),
-    //     );
+        // Assert market registration events.
+        let market_registration_1 = base_market_registration();
+         market_registration_1.integrator_fee = get_MARKET_REGISTRATION_FEE();
+        market_registration_1.market_metadata = market_metadata_1;
+        market_registration_1.time = market_1_registration_time;
+        let market_registration_2 = base_market_registration();
+        market_registration_2.market_metadata = market_metadata_2;
+        market_registration_2.time = market_2_registration_time;
+        market_registration_2.integrator_fee = get_MARKET_REGISTRATION_FEE();
+        let market_registration_events = emitted_events<MarketRegistration>();
+        assert!(vector::length(&market_registration_events) == 2, 0);
+        assert_market_registration(
+            market_registration_1,
+            *vector::borrow(&market_registration_events, 0),
+        );
+        assert_market_registration(
+            market_registration_2,
+            *vector::borrow(&market_registration_events, 1),
+        );
 
-    //     // Assert state events.
-    //     let state_1 = base_state();
-    //     state_1.market_metadata = market_metadata_1;
-    //     state_1.state_metadata.bump_time = market_1_registration_time;
-    //     let state_2 = base_state();
-    //     state_2.market_metadata = market_metadata_2;
-    //     state_2.state_metadata.bump_time = market_2_registration_time;
-    //     state_2.cumulative_stats.integrator_fees = (get_MARKET_REGISTRATION_FEE() as u128);
-    //     let state_events = emitted_events<State>();
-    //     assert!(vector::length(&market_registration_events) == 2, 0);
-    //     assert_state(state_1, *vector::borrow(&state_events, 0));
-    //     assert_state(state_2, *vector::borrow(&state_events, 1));
+        // Assert state events.
+        let state_1 = base_state();
+        state_1.market_metadata = market_metadata_1;
+        state_1.state_metadata.bump_time = market_1_registration_time;
+        let state_2 = base_state();
+        state_2.market_metadata = market_metadata_2;
+        state_2.state_metadata.bump_time = market_2_registration_time;
+        state_2.cumulative_stats.integrator_fees = (get_MARKET_REGISTRATION_FEE() as u128);
+        let state_events = emitted_events<State>();
+        assert!(vector::length(&market_registration_events) == 2, 0);
+        assert_state(state_1, *vector::borrow(&state_events, 0));
+        assert_state(state_2, *vector::borrow(&state_events, 1));
 
+    }
+
+    #[test, expected_failure(
+        abort_code =
+            emojicoin_dot_fun::emojicoin_dot_fun::E_UNABLE_TO_PAY_MARKET_REGISTRATION_DEPOSIT,
+        location = emojicoin_dot_fun
+    )] fun register_market_unable_to_pay_market_registration_deposit() {
+        init_package();
+        mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_DEPOSIT());
+        register_market(&get_signer(USER), SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL, INTEGRATOR);
+    }
+
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_UNABLE_TO_PAY_MARKET_REGISTRATION_FEE,
+        location = emojicoin_dot_fun
+    )] fun register_market_unable_to_pay_market_registration_fee() {
+        init_package();
+        mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_DEPOSIT() * 2);
+                 register_market(&get_signer(USER), SAVE_CORAL_TITLE,SAVE_CORAL_SYMBOL, INTEGRATOR);
+      register_market_without_publish(&get_signer(USER), STOP_WAR_TITLE, STOP_WAR_SYMBOL, INTEGRATOR);
+    }
+
+    // #[test] fun register_market_with_compound_emoji_sequence() {
+    //     init_package();
+    //     let emojis = vector[
+    //         x"e29aa1",         // High voltage.
+    //         x"f09f96a5efb88f", // Desktop computer.
+    //     ];
+    //     let concatenated_bytes = verified_symbol_emoji_bytes(emojis);
+
+    //     // Verify market is not already registered, register, then verify is registered.
+    //     assert!(market_metadata_by_symbol_bytes(concatenated_bytes) == option::none(), 0);
+    //      init_market(b"End Hunger", b"EH");
+    //     let market_metadata =
+    //         option::destroy_some(market_metadata_by_symbol_bytes(concatenated_bytes));
+    //     let (_, _, market_metadata_byes) = unpack_market_metadata(market_metadata);
+    //     assert!(market_metadata_byes == concatenated_bytes, 0);
     // }
 
-//     #[test, expected_failure(
-//         abort_code =
-//             emojicoin_dot_fun::emojicoin_dot_fun::E_UNABLE_TO_PAY_MARKET_REGISTRATION_DEPOSIT,
-//         location = emojicoin_dot_fun
-//     )] fun register_market_unable_to_pay_market_registration_deposit() {
-//         init_package();
-//                  register_market(&get_signer(USER), SAVE_CORAL_TITLE,SAVE_CORAL_SYMBOL, INTEGRATOR);
-//     }
+    #[test] fun remove_liquidity_min_quote_out_met_exactly() {
+        init_package_then_exact_transition();
+        mint_aptos_coin_to(EXACT_TRANSITION_USER, get_QUOTE_REAL_CEILING());
+        provide_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            @black_cat_market,
+            get_QUOTE_REAL_CEILING(),
+            get_LP_TOKENS_INITIAL(),
+        );
+        remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            @black_cat_market,
+            get_LP_TOKENS_INITIAL(),
+            get_QUOTE_REAL_CEILING(),
+        );
+    }
 
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_UNABLE_TO_PAY_MARKET_REGISTRATION_FEE,
-//         location = emojicoin_dot_fun
-//     )] fun register_market_unable_to_pay_market_registration_fee() {
-//         init_package();
-//         mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_DEPOSIT());
-//                  register_market(&get_signer(USER), SAVE_CORAL_TITLE,SAVE_CORAL_SYMBOL, INTEGRATOR);
-//       register_market_without_publish(&get_signer(USER), SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL, INTEGRATOR);
-//     }
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_REMOVE_LIQUIDITY_MIN_QUOTE_OUT_NOT_MET,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun remove_liquidity_min_quote_out_not_met_just_barely() {
+        init_package_then_exact_transition();
+        mint_aptos_coin_to(EXACT_TRANSITION_USER, get_QUOTE_REAL_CEILING());
+        provide_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            @black_cat_market,
+            get_QUOTE_REAL_CEILING(),
+            get_LP_TOKENS_INITIAL(),
+        );
+        remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            @black_cat_market,
+            get_LP_TOKENS_INITIAL(),
+            get_QUOTE_REAL_CEILING() + 1,
+        );
+    }
 
-//     // #[test] fun register_market_with_compound_emoji_sequence() {
-//     //     init_package();
-//     //     let emojis = vector[
-//     //         x"e29aa1",         // High voltage.
-//     //         x"f09f96a5efb88f", // Desktop computer.
-//     //     ];
-//     //     let concatenated_bytes = verified_symbol_emoji_bytes(emojis);
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_REMOVE_LIQUIDITY_MIN_QUOTE_OUT_ZERO,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun remove_liquidity_min_quote_out_zero() {
+        init_package_then_exact_transition();
+        remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            @black_cat_market,
+            1,
+            0,
+        );
+    }
 
-//     //     // Verify market is not already registered, register, then verify is registered.
-//     //     assert!(market_metadata_by_symbol_bytes(concatenated_bytes) == option::none(), 0);
-//     //      init_market(b"End Hunger", b"EH");
-//     //     let market_metadata =
-//     //         option::destroy_some(market_metadata_by_symbol_bytes(concatenated_bytes));
-//     //     let (_, _, market_metadata_byes) = unpack_market_metadata(market_metadata);
-//     //     assert!(market_metadata_byes == concatenated_bytes, 0);
-//     // }
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_LIQUIDITY_NO_LP_COINS,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun remove_liquidity_no_lp_coins() {
+        init_package_then_exact_transition();
+        remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            @black_cat_market,
+            0,
+            1,
+        );
+    }
 
-//     #[test] fun remove_liquidity_min_quote_out_met_exactly() {
-//         init_package_then_exact_transition();
-//         mint_aptos_coin_to(EXACT_TRANSITION_USER, get_QUOTE_REAL_CEILING());
-//         provide_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             @black_cat_market,
-//             get_QUOTE_REAL_CEILING(),
-//             get_LP_TOKENS_INITIAL(),
-//         );
-//         remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             @black_cat_market,
-//             get_LP_TOKENS_INITIAL(),
-//             get_QUOTE_REAL_CEILING(),
-//         );
-//     }
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NO_MARKET,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun remove_liquidity_no_market() {
+        remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            @black_cat_market,
+            1,
+            1,
+        );
+    }
 
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_REMOVE_LIQUIDITY_MIN_QUOTE_OUT_NOT_MET,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun remove_liquidity_min_quote_out_not_met_just_barely() {
-//         init_package_then_exact_transition();
-//         mint_aptos_coin_to(EXACT_TRANSITION_USER, get_QUOTE_REAL_CEILING());
-//         provide_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             @black_cat_market,
-//             get_QUOTE_REAL_CEILING(),
-//             get_LP_TOKENS_INITIAL(),
-//         );
-//         remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             @black_cat_market,
-//             get_LP_TOKENS_INITIAL(),
-//             get_QUOTE_REAL_CEILING() + 1,
-//         );
-//     }
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_STILL_IN_BONDING_CURVE,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun remove_liquidity_still_in_bonding_curve() {
+        init_package_then_simple_buy();
+        remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            @black_cat_market,
+            1,
+            1,
+        );
+    }
 
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_REMOVE_LIQUIDITY_MIN_QUOTE_OUT_ZERO,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun remove_liquidity_min_quote_out_zero() {
-//         init_package_then_exact_transition();
-//         remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             @black_cat_market,
-//             1,
-//             0,
-//         );
-//     }
+    #[test] fun simple_buy_amounts() {
+        // Check quote input amount as a fraction of the amount required to leave bonding curve.
+        assert!(SIMPLE_BUY_INPUT_AMOUNT == get_QUOTE_REAL_CEILING() / SIMPLE_BUY_QUOTE_DIVISOR, 0);
 
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_LIQUIDITY_NO_LP_COINS,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun remove_liquidity_no_lp_coins() {
-//         init_package_then_exact_transition();
-//         remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             @black_cat_market,
-//             0,
-//             1,
-//         );
-//     }
+        // Check nonzero integrator fee requires integer truncation.
+        assert!(
+            (SIMPLE_BUY_INPUT_AMOUNT * (SIMPLE_BUY_INTEGRATOR_FEE_RATE_BPS as u64))
+                % (get_BASIS_POINTS_PER_UNIT() as u64) != 0,
+            0
+        );
+        let integrator_fee =
+            get_bps_fee(SIMPLE_BUY_INPUT_AMOUNT, SIMPLE_BUY_INTEGRATOR_FEE_RATE_BPS);
+        assert!(integrator_fee > 0, 0);
 
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NO_MARKET,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun remove_liquidity_no_market() {
-//         remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             @black_cat_market,
-//             1,
-//             1,
-//         );
-//     }
+        // Get input amount to CLAMM after integrator fee assessed on quote input.
+        let input_amount = SIMPLE_BUY_INPUT_AMOUNT - integrator_fee;
 
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_STILL_IN_BONDING_CURVE,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun remove_liquidity_still_in_bonding_curve() {
-//         init_package_then_simple_buy();
-//         remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             @black_cat_market,
-//             1,
-//             1,
-//         );
-//     }
+        // Define terms via simple CPAMM equation from blackpaper.
+        let b_0 = (get_BASE_VIRTUAL_CEILING() as u128);
+        let q_in = (input_amount as u128);
+        let q_0 = (get_QUOTE_VIRTUAL_FLOOR() as u128);
 
-//     #[test] fun simple_buy_amounts() {
-//         // Check quote input amount as a fraction of the amount required to leave bonding curve.
-//         assert!(SIMPLE_BUY_INPUT_AMOUNT == get_QUOTE_REAL_CEILING() / SIMPLE_BUY_QUOTE_DIVISOR, 0);
+        let numerator = b_0 * q_in;
+        let denominator = q_0 + q_in;
 
-//         // Check nonzero integrator fee requires integer truncation.
-//         assert!(
-//             (SIMPLE_BUY_INPUT_AMOUNT * (SIMPLE_BUY_INTEGRATOR_FEE_RATE_BPS as u64))
-//                 % (get_BASIS_POINTS_PER_UNIT() as u64) != 0,
-//             0
-//         );
-//         let integrator_fee =
-//             get_bps_fee(SIMPLE_BUY_INPUT_AMOUNT, SIMPLE_BUY_INTEGRATOR_FEE_RATE_BPS);
-//         assert!(integrator_fee > 0, 0);
+        // Assert that rounding will indeed take place, such that output will be truncated and
+        // rounding effects will be assumed by swapper.
+        assert!(numerator % denominator != 0, 0);
 
-//         // Get input amount to CLAMM after integrator fee assessed on quote input.
-//         let input_amount = SIMPLE_BUY_INPUT_AMOUNT - integrator_fee;
+        // Determine swap input amount for follow up swap with general fee amount such that follow
+        // up swap will result in an exact state transition.
+        let input_amount = swap_general_case_follow_up_input_amount_to_trigger_state_transition();
+        let integrator_fee_rate = get_bps_fee(input_amount, INTEGRATOR_FEE_RATE_BPS);
+        let quote_to_clamm = input_amount - integrator_fee_rate;
+        let quote_to_transition = get_QUOTE_VIRTUAL_CEILING() -
+            base_market_view_simple_buy().clamm_virtual_reserves.quote;
+        assert!(quote_to_clamm == quote_to_transition, 0);
+    }
 
-//         // Define terms via simple CPAMM equation from blackpaper.
-//         let b_0 = (get_BASE_VIRTUAL_CEILING() as u128);
-//         let q_in = (input_amount as u128);
-//         let q_0 = (get_QUOTE_VIRTUAL_FLOOR() as u128);
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NO_MARKET,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun simulate_provide_liquidity_no_market() {
+        simulate_provide_liquidity(USER, @black_cat_market, 1);
+    }
 
-//         let numerator = b_0 * q_in;
-//         let denominator = q_0 + q_in;
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NO_MARKET,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun simulate_remove_liquidity_no_market() {
+        simulate_remove_liquidity<BlackCatEmojicoin>(USER, @black_cat_market, 1);
+    }
 
-//         // Assert that rounding will indeed take place, such that output will be truncated and
-//         // rounding effects will be assumed by swapper.
-//         assert!(numerator % denominator != 0, 0);
+    #[test] fun simulate_swap_balance_before_zero_cases() {
+        init_package();
+        init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+        disable_registrant_grace_period_check(@black_cat_market);
 
-//         // Determine swap input amount for follow up swap with general fee amount such that follow
-//         // up swap will result in an exact state transition.
-//         let input_amount = swap_general_case_follow_up_input_amount_to_trigger_state_transition();
-//         let integrator_fee_rate = get_bps_fee(input_amount, INTEGRATOR_FEE_RATE_BPS);
-//         let quote_to_clamm = input_amount - integrator_fee_rate;
-//         let quote_to_transition = get_QUOTE_VIRTUAL_CEILING() -
-//             base_market_view_simple_buy().clamm_virtual_reserves.quote;
-//         assert!(quote_to_clamm == quote_to_transition, 0);
-//     }
+        // Verify balance as fraction reported as 0 for no circulating supply.
+        let (
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            balance_as_fraction_of_circulating_supply_before_q64,
+            _,
+        ) = unpack_swap(simulate_swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            USER,
+            @black_cat_market,
+            100,
+            SWAP_BUY,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+        ));
+        assert!(balance_as_fraction_of_circulating_supply_before_q64 == 0, 0);
 
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NO_MARKET,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun simulate_provide_liquidity_no_market() {
-//         simulate_provide_liquidity(USER, @black_cat_market, 1);
-//     }
+        // Verify balance as fraction reported as 0 for user has none of circulating supply, and
+        // does not have coin type registered at account.
+        mint_aptos_coin_to(EXACT_TRANSITION_USER, get_QUOTE_REAL_CEILING());
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            @black_cat_market,
+            EXACT_TRANSITION_INPUT_AMOUNT,
+            SWAP_BUY,
+            EXACT_TRANSITION_INTEGRATOR,
+            EXACT_TRANSITION_INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
+        let (
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            balance_as_fraction_of_circulating_supply_before_q64,
+            _,
+        ) = unpack_swap(simulate_swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            USER,
+            @black_cat_market,
+            100,
+            SWAP_BUY,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+        ));
+        assert!(balance_as_fraction_of_circulating_supply_before_q64 == 0, 0);
 
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NO_MARKET,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun simulate_remove_liquidity_no_market() {
-//         simulate_remove_liquidity<BlackCatEmojicoin>(USER, @black_cat_market, 1);
-//     }
+        // Verify balance as fraction reported as 0 for user has none of circulating supply, and
+        // does have coin type registered at account.
+        aptos_account::transfer_coins<BlackCatEmojicoin>(
+            &get_signer(EXACT_TRANSITION_USER),
+            USER,
+            get_BASE_REAL_CEILING(),
+        );
+        let (
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            balance_as_fraction_of_circulating_supply_before_q64,
+            _,
+        ) = unpack_swap(simulate_swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            EXACT_TRANSITION_USER,
+            @black_cat_market,
+            100,
+            SWAP_BUY,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+        ));
+        assert!(balance_as_fraction_of_circulating_supply_before_q64 == 0, 0);
+    }
 
-//     #[test] fun simulate_swap_balance_before_zero_cases() {
-//         init_package();
-//         init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
-//         disable_registrant_grace_period_check(@black_cat_market);
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NO_MARKET,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun simulate_swap_no_market() {
+        simulate_swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            USER,
+            @0x0,
+            1,
+            SWAP_SELL,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+        );
+    }
 
-//         // Verify balance as fraction reported as 0 for no circulating supply.
-//         let (
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             balance_as_fraction_of_circulating_supply_before_q64,
-//             _,
-//         ) = unpack_swap(simulate_swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             USER,
-//             @black_cat_market,
-//             100,
-//             SWAP_BUY,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//         ));
-//         assert!(balance_as_fraction_of_circulating_supply_before_q64 == 0, 0);
-
-//         // Verify balance as fraction reported as 0 for user has none of circulating supply, and
-//         // does not have coin type registered at account.
-//         mint_aptos_coin_to(EXACT_TRANSITION_USER, get_QUOTE_REAL_CEILING());
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             @black_cat_market,
-//             EXACT_TRANSITION_INPUT_AMOUNT,
-//             SWAP_BUY,
-//             EXACT_TRANSITION_INTEGRATOR,
-//             EXACT_TRANSITION_INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
-//         let (
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             balance_as_fraction_of_circulating_supply_before_q64,
-//             _,
-//         ) = unpack_swap(simulate_swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             USER,
-//             @black_cat_market,
-//             100,
-//             SWAP_BUY,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//         ));
-//         assert!(balance_as_fraction_of_circulating_supply_before_q64 == 0, 0);
-
-//         // Verify balance as fraction reported as 0 for user has none of circulating supply, and
-//         // does have coin type registered at account.
-//         aptos_account::transfer_coins<BlackCatEmojicoin>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             USER,
-//             get_BASE_REAL_CEILING(),
-//         );
-//         let (
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             balance_as_fraction_of_circulating_supply_before_q64,
-//             _,
-//         ) = unpack_swap(simulate_swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             EXACT_TRANSITION_USER,
-//             @black_cat_market,
-//             100,
-//             SWAP_BUY,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//         ));
-//         assert!(balance_as_fraction_of_circulating_supply_before_q64 == 0, 0);
-//     }
-
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NO_MARKET,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun simulate_swap_no_market() {
-//         simulate_swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             USER,
-//             @0x0,
-//             1,
-//             SWAP_SELL,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//         );
-//     }
-
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_SWAP_INPUT_ZERO,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun simulate_swap_no_size() {
-//         init_package_then_simple_buy();
-//         simulate_swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             USER,
-//             base_market_metadata().market_address,
-//             0,
-//             SWAP_SELL,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//         );
-//     }
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_SWAP_INPUT_ZERO,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun simulate_swap_no_size() {
+        init_package_then_simple_buy();
+        simulate_swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            USER,
+            base_market_metadata().market_address,
+            0,
+            SWAP_SELL,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+        );
+    }
 
 //     // #[test] fun supported_symbol_emojis() {
 //     //     init_package();
@@ -3786,999 +3793,1001 @@ const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
 //     //     assert!(!is_a_supported_symbol_emoji(x"ffe29d97"), 0);
 //     // }
 
-//     #[test] fun swap_exact_transition() {
-//         swap_setup_case_test_flow(SwapSetupCaseTestFlow {
-//             simulated_swap: init_package_then_exact_transition(),
-//             mock_swap: base_swap_exact_transition(),
-//             user: EXACT_TRANSITION_USER,
-//             integrator: EXACT_TRANSITION_INTEGRATOR,
-//             mock_market_view: base_market_view_exact_transition(),
-//             mock_registry_view: base_registry_view_exact_transition(),
-//             mock_state: base_state_exact_transition(),
-//         })
-//     }
+    #[test] fun swap_exact_transition() {
+        swap_setup_case_test_flow(SwapSetupCaseTestFlow {
+            simulated_swap: init_package_then_exact_transition(),
+            mock_swap: base_swap_exact_transition(),
+            user: EXACT_TRANSITION_USER,
+            integrator: EXACT_TRANSITION_INTEGRATOR,
+            mock_market_view: base_market_view_exact_transition(),
+            mock_registry_view: base_registry_view_exact_transition(),
+            mock_state: base_state_exact_transition(),
+        })
+    }
 
-//     #[test] fun swap_exact_state_transition_then_buy_large() {
-//         swap_general_case_test_flow(SwapGeneralCaseTestFlow {
-//             setup_is_simple_buy: false,
-//             is_sell: false,
-//             input_amount: get_QUOTE_REAL_CEILING() / 2,
-//         })
-//     }
+    #[test] fun swap_exact_state_transition_then_buy_large() {
 
-//     #[test] fun swap_exact_state_transition_then_buy_small() {
-//         swap_general_case_test_flow(SwapGeneralCaseTestFlow {
-//             setup_is_simple_buy: false,
-//             is_sell: false,
-//             input_amount: get_QUOTE_REAL_CEILING() / 100,
-//         })
-//     }
+        swap_general_case_test_flow(SwapGeneralCaseTestFlow {
+            setup_is_simple_buy: false,
+            is_sell: false,
+            input_amount: get_QUOTE_REAL_CEILING() / 2,
+        })
+    }
 
-//     #[test] fun swap_exact_transition_then_sell_all() {
-//         swap_general_case_test_flow(SwapGeneralCaseTestFlow {
-//             setup_is_simple_buy: false,
-//             is_sell: true,
-//             input_amount: base_swap_exact_transition().net_proceeds,
-//         })
-//     }
+    #[test] fun swap_exact_state_transition_then_buy_small() {
+        swap_general_case_test_flow(SwapGeneralCaseTestFlow {
+            setup_is_simple_buy: false,
+            is_sell: false,
+            input_amount: get_QUOTE_REAL_CEILING() / 100,
+        })
+    }
 
-//     #[test] fun swap_exact_transition_then_sell_half() {
-//         swap_general_case_test_flow(SwapGeneralCaseTestFlow {
-//             setup_is_simple_buy: false,
-//             is_sell: true,
-//             input_amount: base_swap_exact_transition().net_proceeds / 2,
-//         })
-//     }
+    #[test] fun swap_exact_transition_then_sell_all() {
+        swap_general_case_test_flow(SwapGeneralCaseTestFlow {
+            setup_is_simple_buy: false,
+            is_sell: true,
+            input_amount: base_swap_exact_transition().net_proceeds,
+        })
+    }
 
-//     #[test] fun swap_initializes_coin_capabilities() {
-//         init_package();
+    #[test] fun swap_exact_transition_then_sell_half() {
+        swap_general_case_test_flow(SwapGeneralCaseTestFlow {
+            setup_is_simple_buy: false,
+            is_sell: true,
+            input_amount: base_swap_exact_transition().net_proceeds / 2,
+        })
+    }
 
-//         init_market_and_coins_via_swap<YellowHeartEmojicoin, YellowHeartEmojicoinLP>(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
-//         assert!(
-//             exists_lp_coin_capabilities<YellowHeartEmojicoin, YellowHeartEmojicoinLP>(
-//                 @yellow_heart_market
-//             ),
-//             0,
-//         );
-//     }
+    #[test] fun swap_initializes_coin_capabilities() {
+        init_package();
 
-//     // Verify registrant able to buy after period, then non-registrant can buy right after.
-//     #[test] fun swap_grace_period_is_registrant_after_period() {
-//         init_package();
-//       init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
-//         timestamp::update_global_time_for_test(get_PERIOD_5M() + 1);
-//         mint_aptos_coin_to(USER, SIMPLE_BUY_INPUT_AMOUNT);
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             @black_cat_market,
-//             SIMPLE_BUY_INPUT_AMOUNT,
-//             SWAP_BUY,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
-//         mint_aptos_coin_to(SIMPLE_BUY_USER, SIMPLE_BUY_INPUT_AMOUNT);
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(SIMPLE_BUY_USER),
-//             @black_cat_market,
-//             SIMPLE_BUY_INPUT_AMOUNT,
-//             SWAP_BUY,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
-//     }
+        init_market_and_coins_via_swap<YellowHeartEmojicoin, YellowHeartEmojicoinLP>(END_HUNGER_TITLE, END_HUNGER_SYMBOL);
+        assert!(
+            exists_lp_coin_capabilities<YellowHeartEmojicoin, YellowHeartEmojicoinLP>(
+                @yellow_heart_market
+            ),
+            0,
+        );
+    }
 
-//     // Verify registrant able to buy during period, then non-registrant can buy right after.
-//     #[test] fun swap_grace_period_is_registrant_during_period() {
-//         init_package();
-//        init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
-//         timestamp::update_global_time_for_test(get_PERIOD_5M());
-//         mint_aptos_coin_to(USER, SIMPLE_BUY_INPUT_AMOUNT);
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             @black_cat_market,
-//             SIMPLE_BUY_INPUT_AMOUNT,
-//             SWAP_BUY,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
-//         mint_aptos_coin_to(SIMPLE_BUY_USER, SIMPLE_BUY_INPUT_AMOUNT);
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(SIMPLE_BUY_USER),
-//             @black_cat_market,
-//             SIMPLE_BUY_INPUT_AMOUNT,
-//             SWAP_BUY,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
-//     }
+    // Verify registrant able to buy after period, then non-registrant can buy right after.
+    #[test] fun swap_grace_period_is_registrant_after_period() {
+        init_package();
+      init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+        timestamp::update_global_time_for_test(get_PERIOD_5M() + 1);
+        mint_aptos_coin_to(USER, SIMPLE_BUY_INPUT_AMOUNT);
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            @black_cat_market,
+            SIMPLE_BUY_INPUT_AMOUNT,
+            SWAP_BUY,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
+        mint_aptos_coin_to(SIMPLE_BUY_USER, SIMPLE_BUY_INPUT_AMOUNT);
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(SIMPLE_BUY_USER),
+            @black_cat_market,
+            SIMPLE_BUY_INPUT_AMOUNT,
+            SWAP_BUY,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
+    }
+
+    // Verify registrant able to buy during period, then non-registrant can buy right after.
+    #[test] fun swap_grace_period_is_registrant_during_period() {
+        init_package();
+       init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+        timestamp::update_global_time_for_test(get_PERIOD_5M());
+        mint_aptos_coin_to(USER, SIMPLE_BUY_INPUT_AMOUNT);
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            @black_cat_market,
+            SIMPLE_BUY_INPUT_AMOUNT,
+            SWAP_BUY,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
+        mint_aptos_coin_to(SIMPLE_BUY_USER, SIMPLE_BUY_INPUT_AMOUNT);
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(SIMPLE_BUY_USER),
+            @black_cat_market,
+            SIMPLE_BUY_INPUT_AMOUNT,
+            SWAP_BUY,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
+    }
 
 
-//     // Verify non-registrant user can buy after the grace period has lapsed, then again after that.
-//     #[test] fun swap_grace_period_not_registrant_after_period() {
-//         init_package();
-//    init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
-//         timestamp::update_global_time_for_test(get_PERIOD_5M() + 1);
-//         mint_aptos_coin_to(SIMPLE_BUY_USER, SIMPLE_BUY_INPUT_AMOUNT);
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(SIMPLE_BUY_USER),
-//             @black_cat_market,
-//             SIMPLE_BUY_INPUT_AMOUNT,
-//             SWAP_BUY,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
-//         mint_aptos_coin_to(SIMPLE_BUY_USER, SIMPLE_BUY_INPUT_AMOUNT);
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(SIMPLE_BUY_USER),
-//             @black_cat_market,
-//             SIMPLE_BUY_INPUT_AMOUNT,
-//             SWAP_BUY,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
-//     }
+    // Verify non-registrant user can buy after the grace period has lapsed, then again after that.
+    #[test] fun swap_grace_period_not_registrant_after_period() {
+        init_package();
+   init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+        timestamp::update_global_time_for_test(get_PERIOD_5M() + 1);
+        mint_aptos_coin_to(SIMPLE_BUY_USER, SIMPLE_BUY_INPUT_AMOUNT);
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(SIMPLE_BUY_USER),
+            @black_cat_market,
+            SIMPLE_BUY_INPUT_AMOUNT,
+            SWAP_BUY,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
+        mint_aptos_coin_to(SIMPLE_BUY_USER, SIMPLE_BUY_INPUT_AMOUNT);
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(SIMPLE_BUY_USER),
+            @black_cat_market,
+            SIMPLE_BUY_INPUT_AMOUNT,
+            SWAP_BUY,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
+    }
 
-//     // Verify non-registrant user unable to buy during the grace period.
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NOT_REGISTRANT,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun swap_grace_period_not_registrant_during_period() {
-//         init_package();
-//     init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
-//         timestamp::update_global_time_for_test(get_PERIOD_5M());
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(SIMPLE_BUY_USER),
-//             @black_cat_market,
-//             SIMPLE_BUY_INPUT_AMOUNT,
-//             SWAP_BUY,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
-//     }
+    // Verify non-registrant user unable to buy during the grace period.
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NOT_REGISTRANT,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun swap_grace_period_not_registrant_during_period() {
+        init_package();
+    init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+        timestamp::update_global_time_for_test(get_PERIOD_5M());
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(SIMPLE_BUY_USER),
+            @black_cat_market,
+            SIMPLE_BUY_INPUT_AMOUNT,
+            SWAP_BUY,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
+    }
 
-//     #[test] fun swap_min_output_met_exactly() {
-//         init_package();
-//       init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
-//         disable_registrant_grace_period_check(@black_cat_market);
-//         mint_aptos_coin_to(EXACT_TRANSITION_USER, EXACT_TRANSITION_INPUT_AMOUNT);
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             base_market_metadata().market_address,
-//             EXACT_TRANSITION_INPUT_AMOUNT,
-//             SWAP_BUY,
-//             EXACT_TRANSITION_INTEGRATOR,
-//             EXACT_TRANSITION_INTEGRATOR_FEE_RATE_BPS,
-//             get_BASE_REAL_CEILING(),
-//         );
-//     }
+    #[test] fun swap_min_output_met_exactly() {
+        init_package();
+      init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+        disable_registrant_grace_period_check(@black_cat_market);
+        mint_aptos_coin_to(EXACT_TRANSITION_USER, EXACT_TRANSITION_INPUT_AMOUNT);
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            base_market_metadata().market_address,
+            EXACT_TRANSITION_INPUT_AMOUNT,
+            SWAP_BUY,
+            EXACT_TRANSITION_INTEGRATOR,
+            EXACT_TRANSITION_INTEGRATOR_FEE_RATE_BPS,
+            get_BASE_REAL_CEILING(),
+        );
+    }
 
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_SWAP_MIN_OUTPUT_NOT_MET,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun swap_min_output_not_met_just_barely() {
-//         init_package();
-//      init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
-//         disable_registrant_grace_period_check(@black_cat_market);
-//         mint_aptos_coin_to(EXACT_TRANSITION_USER, EXACT_TRANSITION_INPUT_AMOUNT);
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             base_market_metadata().market_address,
-//             EXACT_TRANSITION_INPUT_AMOUNT,
-//             SWAP_BUY,
-//             EXACT_TRANSITION_INTEGRATOR,
-//             EXACT_TRANSITION_INTEGRATOR_FEE_RATE_BPS,
-//             get_BASE_REAL_CEILING() + 1,
-//         );
-//     }
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_SWAP_MIN_OUTPUT_NOT_MET,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun swap_min_output_not_met_just_barely() {
+        init_package();
+     init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+        disable_registrant_grace_period_check(@black_cat_market);
+        mint_aptos_coin_to(EXACT_TRANSITION_USER, EXACT_TRANSITION_INPUT_AMOUNT);
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            base_market_metadata().market_address,
+            EXACT_TRANSITION_INPUT_AMOUNT,
+            SWAP_BUY,
+            EXACT_TRANSITION_INTEGRATOR,
+            EXACT_TRANSITION_INTEGRATOR_FEE_RATE_BPS,
+            get_BASE_REAL_CEILING() + 1,
+        );
+    }
 
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_SWAP_MIN_OUTPUT_AMOUNT_ZERO,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun swap_min_output_amount_zero() {
-//         init_package_then_simple_buy();
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             base_market_metadata().market_address,
-//             1,
-//             SWAP_SELL,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             0,
-//         );
-//     }
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_SWAP_MIN_OUTPUT_AMOUNT_ZERO,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun swap_min_output_amount_zero() {
+        init_package_then_simple_buy();
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            base_market_metadata().market_address,
+            1,
+            SWAP_SELL,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            0,
+        );
+    }
 
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_SWAP_NOT_ENOUGH_BASE,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun swap_no_base() {
-//         init_package_then_simple_buy();
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             base_market_metadata().market_address,
-//             100_000_000,
-//             SWAP_SELL,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
-//     }
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_SWAP_NOT_ENOUGH_BASE,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun swap_no_base() {
+        init_package_then_simple_buy();
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            base_market_metadata().market_address,
+            100_000_000,
+            SWAP_SELL,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
+    }
 
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NO_MARKET,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun swap_no_market() {
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             @0x0,
-//             1,
-//             SWAP_SELL,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
-//     }
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_NO_MARKET,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun swap_no_market() {
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            @0x0,
+            1,
+            SWAP_SELL,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
+    }
 
-//     #[test, expected_failure(
-//         abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_SWAP_OUTPUT_AMOUNT_ZERO,
-//         location = emojicoin_dot_fun::emojicoin_dot_fun,
-//     )] fun swap_no_output() {
-//         init_package_then_simple_buy();
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             base_market_metadata().market_address,
-//             1,
-//             SWAP_SELL,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
-//     }
+    #[test, expected_failure(
+        abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_SWAP_OUTPUT_AMOUNT_ZERO,
+        location = emojicoin_dot_fun::emojicoin_dot_fun,
+    )] fun swap_no_output() {
+        init_package_then_simple_buy();
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            base_market_metadata().market_address,
+            1,
+            SWAP_SELL,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
+    }
 
-//     #[test, expected_failure(
-//         abort_code = 65542, // 0x1 << 16 + 6, error:invalid_argument(EINSUFFICIENT_BALANCE)
-//         location = aptos_framework::coin,
-//     )] fun swap_no_quote() {
-//         init_package_then_simple_buy();
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             base_market_metadata().market_address,
-//             1,
-//             SWAP_BUY,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
-//     }
+    #[test, expected_failure(
+        abort_code = 65542, // 0x1 << 16 + 6, error:invalid_argument(EINSUFFICIENT_BALANCE)
+        location = aptos_framework::coin,
+    )] fun swap_no_quote() {
+        init_package_then_simple_buy();
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            base_market_metadata().market_address,
+            1,
+            SWAP_BUY,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
+    }
 
-//     #[test] fun swap_simple_buy() {
-//         swap_setup_case_test_flow(SwapSetupCaseTestFlow {
-//             simulated_swap: init_package_then_simple_buy(),
-//             mock_swap: base_swap_simple_buy(),
-//             user: SIMPLE_BUY_USER,
-//             integrator: SIMPLE_BUY_INTEGRATOR,
-//             mock_market_view: base_market_view_simple_buy(),
-//             mock_registry_view: base_registry_view_simple_buy(),
-//             mock_state: base_state_simple_buy(),
-//         })
-//     }
+    #[test] fun swap_simple_buy() {
+        swap_setup_case_test_flow(SwapSetupCaseTestFlow {
+            simulated_swap: init_package_then_simple_buy(),
+            mock_swap: base_swap_simple_buy(),
+            user: SIMPLE_BUY_USER,
+            integrator: SIMPLE_BUY_INTEGRATOR,
+            mock_market_view: base_market_view_simple_buy(),
+            mock_registry_view: base_registry_view_simple_buy(),
+            mock_state: base_state_simple_buy(),
+        })
+    }
 
-//     #[test] fun swap_simple_buy_then_buy_past_state_transition_large() {
-//         swap_general_case_test_flow(SwapGeneralCaseTestFlow {
-//             setup_is_simple_buy: true,
-//             is_sell: false,
-//             input_amount: swap_general_case_follow_up_input_amount_to_trigger_state_transition() +
-//                 get_QUOTE_REAL_CEILING() / 10,
-//         });
-//     }
+    #[test] fun swap_simple_buy_then_buy_past_state_transition_large() {
+        swap_general_case_test_flow(SwapGeneralCaseTestFlow {
+            setup_is_simple_buy: true,
+            is_sell: false,
+            input_amount: swap_general_case_follow_up_input_amount_to_trigger_state_transition() +
+                get_QUOTE_REAL_CEILING() / 10,
+        });
+    }
 
-//     #[test] fun swap_simple_buy_then_buy_past_state_transition_small() {
-//         swap_general_case_test_flow(SwapGeneralCaseTestFlow {
-//             setup_is_simple_buy: true,
-//             is_sell: false,
-//             input_amount: swap_general_case_follow_up_input_amount_to_trigger_state_transition() +
-//                 1,
-//         });
-//     }
+    #[test] fun swap_simple_buy_then_buy_past_state_transition_small() {
+        swap_general_case_test_flow(SwapGeneralCaseTestFlow {
+            setup_is_simple_buy: true,
+            is_sell: false,
+            input_amount: swap_general_case_follow_up_input_amount_to_trigger_state_transition() +
+                1,
+        });
+    }
 
-//     #[test] fun swap_simple_buy_then_buy_small() {
-//         swap_general_case_test_flow(SwapGeneralCaseTestFlow {
-//             setup_is_simple_buy: true,
-//             is_sell: false,
-//             input_amount: SIMPLE_BUY_INPUT_AMOUNT,
-//         });
-//     }
+    #[test] fun swap_simple_buy_then_buy_small() {
+        swap_general_case_test_flow(SwapGeneralCaseTestFlow {
+            setup_is_simple_buy: true,
+            is_sell: false,
+            input_amount: SIMPLE_BUY_INPUT_AMOUNT,
+        });
+    }
 
-//     #[test] fun swap_simple_buy_then_buy_to_exact_state_transition() {
-//         swap_general_case_test_flow(SwapGeneralCaseTestFlow {
-//             setup_is_simple_buy: true,
-//             is_sell: false,
-//             input_amount: swap_general_case_follow_up_input_amount_to_trigger_state_transition(),
-//         });
-//         let market_view = market_view<BlackCatEmojicoin, BlackCatEmojicoinLP>(@black_cat_market);
-//         let (
-//             _,
-//             _,
-//             clamm_virtual_reserves,
-//             cpamm_real_reserves,
-//             lp_coin_supply,
-//             in_bonding_curve,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             emojicoin_lp_balance,
-//         ) = unpack_market_view(market_view);
-//         assert_reserves(
-//             base_market_view_exact_transition().clamm_virtual_reserves,
-//             clamm_virtual_reserves,
-//         );
-//         assert_reserves(
-//             base_market_view_exact_transition().cpamm_real_reserves,
-//             cpamm_real_reserves,
-//         );
-//         assert!((lp_coin_supply as u64) == get_LP_TOKENS_INITIAL(), 0);
-//         assert!(!in_bonding_curve, 0);
-//         assert!(emojicoin_lp_balance == get_LP_TOKENS_INITIAL(), 0);
-//     }
+    #[test] fun swap_simple_buy_then_buy_to_exact_state_transition() {
+        swap_general_case_test_flow(SwapGeneralCaseTestFlow {
+            setup_is_simple_buy: true,
+            is_sell: false,
+            input_amount: swap_general_case_follow_up_input_amount_to_trigger_state_transition(),
+        });
+        let market_view = market_view<BlackCatEmojicoin, BlackCatEmojicoinLP>(@black_cat_market);
+        let (
+            _,
+            _,
+            clamm_virtual_reserves,
+            cpamm_real_reserves,
+            lp_coin_supply,
+            in_bonding_curve,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            emojicoin_lp_balance,
+        ) = unpack_market_view(market_view);
+        assert_reserves(
+            base_market_view_exact_transition().clamm_virtual_reserves,
+            clamm_virtual_reserves,
+        );
+        assert_reserves(
+            base_market_view_exact_transition().cpamm_real_reserves,
+            cpamm_real_reserves,
+        );
+        assert!((lp_coin_supply as u64) == get_LP_TOKENS_INITIAL(), 0);
+        assert!(!in_bonding_curve, 0);
+        assert!(emojicoin_lp_balance == get_LP_TOKENS_INITIAL(), 0);
+    }
 
-//     #[test] fun swap_simple_buy_then_sell_back_all() {
-//         swap_general_case_test_flow(SwapGeneralCaseTestFlow {
-//             setup_is_simple_buy: true,
-//             is_sell: true,
-//             input_amount: base_swap_simple_buy().net_proceeds,
-//         })
-//     }
+    #[test] fun swap_simple_buy_then_sell_back_all() {
+        swap_general_case_test_flow(SwapGeneralCaseTestFlow {
+            setup_is_simple_buy: true,
+            is_sell: true,
+            input_amount: base_swap_simple_buy().net_proceeds,
+        })
+    }
 
-//     #[test] fun swap_simple_buy_then_sell_back_half() {
-//         swap_general_case_test_flow(SwapGeneralCaseTestFlow {
-//             setup_is_simple_buy: true,
-//             is_sell: true,
-//             input_amount: base_swap_simple_buy().net_proceeds / 2,
-//         })
-//     }
+    #[test] fun swap_simple_buy_then_sell_back_half() {
+        swap_general_case_test_flow(SwapGeneralCaseTestFlow {
+            setup_is_simple_buy: true,
+            is_sell: true,
+            input_amount: base_swap_simple_buy().net_proceeds / 2,
+        })
+    }
 
-//     #[test] fun triggers_complex() {
-//         // Initialize package then do an exact transition swap at exact transition time.
-//         init_package_then_exact_transition();
+    #[test] fun triggers_complex() {
+        // Initialize package then do an exact transition swap at exact transition time.
+        init_package_then_exact_transition();
 
-//         // Advance timer to 1 minute boundary so that 1 minute periodic state tracker triggers on
-//         // next action.
-//         let time = get_PERIOD_1M();
-//         timestamp::update_global_time_for_test(time);
+        // Advance timer to 1 minute boundary so that 1 minute periodic state tracker triggers on
+        // next action.
+        let time = get_PERIOD_1M();
+        timestamp::update_global_time_for_test(time);
 
-//         // Emit a simple chat event that triggers the 1 minute periodic state tracker.
-//         chat<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             @black_cat_market,
-//           b"Hello"
-//         );
+        // Emit a simple chat event that triggers the 1 minute periodic state tracker.
+        chat<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            @black_cat_market,
+          b"Hello"
+        );
 
-//         // Verify the periodic state event.
-//         let exact_transition_swap_event = base_swap_exact_transition();
-//         let exact_transition_price = exact_transition_swap_event.avg_execution_price_q64;
-//         let mock_periodic_state_events = vector[
-//             MockPeriodicState {
-//                 market_metadata: base_market_metadata(),
-//                 periodic_state_metadata: MockPeriodicStateMetadata {
-//                     start_time: 0,
-//                     period: get_PERIOD_1M(),
-//                     emit_time: get_PERIOD_1M(),
-//                     emit_market_nonce: 3,
-//                     trigger: get_TRIGGER_CHAT(),
-//                 },
-//                 open_price_q64: exact_transition_price,
-//                 high_price_q64: exact_transition_price,
-//                 low_price_q64: exact_transition_price,
-//                 close_price_q64: exact_transition_price,
-//                 volume_base: (exact_transition_swap_event.base_volume as u128),
-//                 volume_quote: (exact_transition_swap_event.quote_volume as u128),
-//                 integrator_fees: 0,
-//                 pool_fees_base: 0,
-//                 pool_fees_quote: 0,
-//                 n_swaps: 1,
-//                 n_chat_messages: 0,
-//                 starts_in_bonding_curve: true,
-//                 ends_in_bonding_curve: false,
-//                 tvl_per_lp_coin_growth_q64: 0,
-//             }
-//         ];
-//         assert_periodic_state_tail_cumulative(mock_periodic_state_events, 1);
+        // Verify the periodic state event.
+        let exact_transition_swap_event = base_swap_exact_transition();
+        let exact_transition_price = exact_transition_swap_event.avg_execution_price_q64;
+        let mock_periodic_state_events = vector[
+            MockPeriodicState {
+                market_metadata: base_market_metadata(),
+                periodic_state_metadata: MockPeriodicStateMetadata {
+                    start_time: 0,
+                    period: get_PERIOD_1M(),
+                    emit_time: get_PERIOD_1M(),
+                    emit_market_nonce: 3,
+                    trigger: get_TRIGGER_CHAT(),
+                },
+                open_price_q64: exact_transition_price,
+                high_price_q64: exact_transition_price,
+                low_price_q64: exact_transition_price,
+                close_price_q64: exact_transition_price,
+                volume_base: (exact_transition_swap_event.base_volume as u128),
+                volume_quote: (exact_transition_swap_event.quote_volume as u128),
+                integrator_fees: get_MARKET_REGISTRATION_DEPOSIT() as u128,
+                pool_fees_base: 0,
+                pool_fees_quote: 0,
+                n_swaps: 1,
+                n_chat_messages: 0,
+                starts_in_bonding_curve: true,
+                ends_in_bonding_curve: false,
+                tvl_per_lp_coin_growth_q64: 0,
+            }
+        ];
+        assert_periodic_state_tail_cumulative(mock_periodic_state_events, 1);
 
-//         // Get TVL and LP coins at beginning of period.
-//         let tvl_to_lp_coin_ratio_1 = tvl_to_lp_coin_ratio();
+        // Get TVL and LP coins at beginning of period.
+        let tvl_to_lp_coin_ratio_1 = tvl_to_lp_coin_ratio();
 
-//         // Advance timer 1 microsecond, execute a swap sell.
-//         time = time + 1;
-//         timestamp::update_global_time_for_test(time);
-//         let swap_sell_1_input_amount = exact_transition_swap_event.base_volume / 10;
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             @black_cat_market,
-//             swap_sell_1_input_amount,
-//             SWAP_SELL,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
+        // Advance timer 1 microsecond, execute a swap sell.
+        time = time + 1;
+        timestamp::update_global_time_for_test(time);
+        let swap_sell_1_input_amount = exact_transition_swap_event.base_volume / 10;
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            @black_cat_market,
+            swap_sell_1_input_amount,
+            SWAP_SELL,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
 
-//         // Get swap event data.
-//         let (
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             swap_sell_1_net_proceeds_in_quote,
-//             swap_sell_1_base_volume,
-//             swap_sell_1_quote_volume,
-//             swap_sell_1_price_q64,
-//             swap_sell_1_integrator_fee,
-//             swap_sell_1_quote_pool_fee,
-//             _,
-//             _,
-//             _,
-//             _,
-//         ) = unpack_swap(vector::pop_back(&mut emitted_events<Swap>()));
-//         assert!(swap_sell_1_price_q64 > exact_transition_price, 0);
+        // Get swap event data.
+        let (
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            swap_sell_1_net_proceeds_in_quote,
+            swap_sell_1_base_volume,
+            swap_sell_1_quote_volume,
+            swap_sell_1_price_q64,
+            swap_sell_1_integrator_fee,
+            swap_sell_1_quote_pool_fee,
+            _,
+            _,
+            _,
+            _,
+        ) = unpack_swap(vector::pop_back(&mut emitted_events<Swap>()));
+        assert!(swap_sell_1_price_q64 > exact_transition_price, 0);
 
-//         // Advance timer 1 microsecond, execute a swap buy.
-//         time = time + 1;
-//         timestamp::update_global_time_for_test(time);
-//         let swap_buy_1_input_amount = swap_sell_1_net_proceeds_in_quote / 2;
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             @black_cat_market,
-//             swap_buy_1_input_amount,
-//             SWAP_BUY,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
+        // Advance timer 1 microsecond, execute a swap buy.
+        time = time + 1;
+        timestamp::update_global_time_for_test(time);
+        let swap_buy_1_input_amount = swap_sell_1_net_proceeds_in_quote / 2;
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            @black_cat_market,
+            swap_buy_1_input_amount,
+            SWAP_BUY,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
 
-//         // Get swap event data.
-//         let (
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             swap_buy_1_base_volume,
-//             swap_buy_1_quote_volume,
-//             swap_buy_1_price_q64,
-//             swap_buy_1_integrator_fee,
-//             swap_buy_1_base_pool_fee,
-//             _,
-//             _,
-//             _,
-//             _,
-//         ) = unpack_swap(vector::pop_back(&mut emitted_events<Swap>()));
-//         assert!(swap_buy_1_price_q64 < swap_sell_1_price_q64, 0);
+        // Get swap event data.
+        let (
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            swap_buy_1_base_volume,
+            swap_buy_1_quote_volume,
+            swap_buy_1_price_q64,
+            swap_buy_1_integrator_fee,
+            swap_buy_1_base_pool_fee,
+            _,
+            _,
+            _,
+            _,
+        ) = unpack_swap(vector::pop_back(&mut emitted_events<Swap>()));
+        assert!(swap_buy_1_price_q64 < swap_sell_1_price_q64, 0);
 
-//         // Advance timer 1 microsecond, provide liquidity.
-//         time = time + 1;
-//         timestamp::update_global_time_for_test(time);
-//         let provide_liquidity_quote_amount =
-//             swap_sell_1_net_proceeds_in_quote - swap_buy_1_input_amount;
-//         provide_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             @black_cat_market,
-//             provide_liquidity_quote_amount,
-//             1,
-//         );
+        // Advance timer 1 microsecond, provide liquidity.
+        time = time + 1;
+        timestamp::update_global_time_for_test(time);
+        let provide_liquidity_quote_amount =
+            swap_sell_1_net_proceeds_in_quote - swap_buy_1_input_amount;
+        provide_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            @black_cat_market,
+            provide_liquidity_quote_amount,
+            1,
+        );
 
-//         // Get number of LP coins provided as liquidity.
-//         let ( _, _, _, _, _, _, provide_liquidity_lp_coin_amount, _, _, _) =
-//             unpack_liquidity(vector::pop_back(&mut emitted_events<Liquidity>()));
+        // Get number of LP coins provided as liquidity.
+        let ( _, _, _, _, _, _, provide_liquidity_lp_coin_amount, _, _, _) =
+            unpack_liquidity(vector::pop_back(&mut emitted_events<Liquidity>()));
 
-//         // Get TVL per LP coin growth during the period, verify it matches that of helper function.
-//         let tvl_to_lp_coin_ratio_2 = tvl_to_lp_coin_ratio();
-//         let tvl_per_lp_coin_growth_q64_1_2 = tvl_per_lp_coin_growth_q64_during_current_period(
-//             tvl_to_lp_coin_ratio_1,
-//             tvl_to_lp_coin_ratio_2,
-//         );
-//         assert!(
-//             tvl_per_lp_coin_growth_q64_1_2 == tvl_per_lp_coin_growth_q64(
-//                 pack_tvl_to_lp_coin_ratio(
-//                     tvl_to_lp_coin_ratio_1.tvl,
-//                     tvl_to_lp_coin_ratio_1.lp_coins,
-//                 ),
-//                 pack_tvl_to_lp_coin_ratio(
-//                     tvl_to_lp_coin_ratio_2.tvl,
-//                     tvl_to_lp_coin_ratio_2.lp_coins,
-//                 ),
-//             ),
-//             0,
-//         );
+        // Get TVL per LP coin growth during the period, verify it matches that of helper function.
+        let tvl_to_lp_coin_ratio_2 = tvl_to_lp_coin_ratio();
+        let tvl_per_lp_coin_growth_q64_1_2 = tvl_per_lp_coin_growth_q64_during_current_period(
+            tvl_to_lp_coin_ratio_1,
+            tvl_to_lp_coin_ratio_2,
+        );
+        assert!(
+            tvl_per_lp_coin_growth_q64_1_2 == tvl_per_lp_coin_growth_q64(
+                pack_tvl_to_lp_coin_ratio(
+                    tvl_to_lp_coin_ratio_1.tvl,
+                    tvl_to_lp_coin_ratio_1.lp_coins,
+                ),
+                pack_tvl_to_lp_coin_ratio(
+                    tvl_to_lp_coin_ratio_2.tvl,
+                    tvl_to_lp_coin_ratio_2.lp_coins,
+                ),
+            ),
+            0,
+        );
 
-//         // Advance timer to next 1 minute boundary, remove liquidity.
-//         time = 2 * get_PERIOD_1M();
-//         timestamp::update_global_time_for_test(time);
-//         remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             @black_cat_market,
-//             provide_liquidity_lp_coin_amount,
-//             1,
-//         );
+        // Advance timer to next 1 minute boundary, remove liquidity.
+        time = 2 * get_PERIOD_1M();
+        timestamp::update_global_time_for_test(time);
+        remove_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            @black_cat_market,
+            provide_liquidity_lp_coin_amount,
+            1,
+        );
 
-//         // Verify the periodic state event.
-//         vector::push_back(&mut mock_periodic_state_events, MockPeriodicState {
-//             market_metadata: base_market_metadata(),
-//             periodic_state_metadata: MockPeriodicStateMetadata {
-//                 start_time: get_PERIOD_1M(),
-//                 period: get_PERIOD_1M(),
-//                 emit_time: 2 * get_PERIOD_1M(),
-//                 emit_market_nonce: 7,
-//                 trigger: get_TRIGGER_REMOVE_LIQUIDITY(),
-//             },
-//             open_price_q64: swap_sell_1_price_q64,
-//             high_price_q64: swap_sell_1_price_q64,
-//             low_price_q64: swap_buy_1_price_q64,
-//             close_price_q64: swap_buy_1_price_q64,
-//             volume_base: ((swap_buy_1_base_volume + swap_sell_1_base_volume) as u128),
-//             volume_quote: ((swap_buy_1_quote_volume + swap_sell_1_quote_volume) as u128),
-//             integrator_fees: ((swap_buy_1_integrator_fee + swap_sell_1_integrator_fee) as u128),
-//             pool_fees_base: (swap_buy_1_base_pool_fee as u128),
-//             pool_fees_quote: (swap_sell_1_quote_pool_fee as u128),
-//             n_swaps: 2,
-//             n_chat_messages: 1,
-//             starts_in_bonding_curve: false,
-//             ends_in_bonding_curve: false,
-//             tvl_per_lp_coin_growth_q64: tvl_per_lp_coin_growth_q64_1_2,
-//         });
-//         assert_periodic_state_tail_cumulative(mock_periodic_state_events, 1);
+        // Verify the periodic state event.
+        vector::push_back(&mut mock_periodic_state_events, MockPeriodicState {
+            market_metadata: base_market_metadata(),
+            periodic_state_metadata: MockPeriodicStateMetadata {
+                start_time: get_PERIOD_1M(),
+                period: get_PERIOD_1M(),
+                emit_time: 2 * get_PERIOD_1M(),
+                emit_market_nonce: 7,
+                trigger: get_TRIGGER_REMOVE_LIQUIDITY(),
+            },
+            open_price_q64: swap_sell_1_price_q64,
+            high_price_q64: swap_sell_1_price_q64,
+            low_price_q64: swap_buy_1_price_q64,
+            close_price_q64: swap_buy_1_price_q64,
+            volume_base: ((swap_buy_1_base_volume + swap_sell_1_base_volume) as u128),
+            volume_quote: ((swap_buy_1_quote_volume + swap_sell_1_quote_volume) as u128),
+            integrator_fees: ((swap_buy_1_integrator_fee + swap_sell_1_integrator_fee) as u128),
+            pool_fees_base: (swap_buy_1_base_pool_fee as u128),
+            pool_fees_quote: (swap_sell_1_quote_pool_fee as u128),
+            n_swaps: 2,
+            n_chat_messages: 1,
+            starts_in_bonding_curve: false,
+            ends_in_bonding_curve: false,
+            tvl_per_lp_coin_growth_q64: tvl_per_lp_coin_growth_q64_1_2,
+        });
+        assert_periodic_state_tail_cumulative(mock_periodic_state_events, 1);
 
-//         // Advance timer to next 1 minute boundary.
-//         time = 3 * get_PERIOD_1M();
-//         timestamp::update_global_time_for_test(time);
+        // Advance timer to next 1 minute boundary.
+        time = 3 * get_PERIOD_1M();
+        timestamp::update_global_time_for_test(time);
 
-//         // Recalculate TVL per LP coin growth over the period.
-//         let tvl_to_lp_coin_ratio_3 = tvl_to_lp_coin_ratio();
-//         let tvl_per_lp_coin_growth_q64_2_3 = tvl_per_lp_coin_growth_q64_during_current_period(
-//             tvl_to_lp_coin_ratio_2,
-//             tvl_to_lp_coin_ratio_3,
-//         );
+        // Recalculate TVL per LP coin growth over the period.
+        let tvl_to_lp_coin_ratio_3 = tvl_to_lp_coin_ratio();
+        let tvl_per_lp_coin_growth_q64_2_3 = tvl_per_lp_coin_growth_q64_during_current_period(
+            tvl_to_lp_coin_ratio_2,
+            tvl_to_lp_coin_ratio_3,
+        );
 
-//         // Provide more liquidity, triggering a periodic state event.
-//         let new_provide_liquidity_quote_amount = provide_liquidity_quote_amount / 2;
-//         provide_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             @black_cat_market,
-//             new_provide_liquidity_quote_amount,
-//             1,
-//         );
+        // Provide more liquidity, triggering a periodic state event.
+        let new_provide_liquidity_quote_amount = provide_liquidity_quote_amount / 2;
+        provide_liquidity<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            @black_cat_market,
+            new_provide_liquidity_quote_amount,
+            1,
+        );
 
-//         // Verify the periodic state event.
-//         vector::push_back(&mut mock_periodic_state_events, MockPeriodicState {
-//             market_metadata: base_market_metadata(),
-//             periodic_state_metadata: MockPeriodicStateMetadata {
-//                 start_time: 2 * get_PERIOD_1M(),
-//                 period: get_PERIOD_1M(),
-//                 emit_time: 3 * get_PERIOD_1M(),
-//                 emit_market_nonce: 8,
-//                 trigger: get_TRIGGER_PROVIDE_LIQUIDITY(),
-//             },
-//             open_price_q64: 0,
-//             high_price_q64: 0,
-//             low_price_q64: 0,
-//             close_price_q64: 0,
-//             volume_base: 0,
-//             volume_quote: 0,
-//             integrator_fees: 0,
-//             pool_fees_base: 0,
-//             pool_fees_quote: 0,
-//             n_swaps: 0,
-//             n_chat_messages: 0,
-//             starts_in_bonding_curve: false,
-//             ends_in_bonding_curve: false,
-//             tvl_per_lp_coin_growth_q64: tvl_per_lp_coin_growth_q64_2_3,
-//         });
-//         assert_periodic_state_tail_cumulative(mock_periodic_state_events, 1);
+        // Verify the periodic state event.
+        vector::push_back(&mut mock_periodic_state_events, MockPeriodicState {
+            market_metadata: base_market_metadata(),
+            periodic_state_metadata: MockPeriodicStateMetadata {
+                start_time: 2 * get_PERIOD_1M(),
+                period: get_PERIOD_1M(),
+                emit_time: 3 * get_PERIOD_1M(),
+                emit_market_nonce: 8,
+                trigger: get_TRIGGER_PROVIDE_LIQUIDITY(),
+            },
+            open_price_q64: 0,
+            high_price_q64: 0,
+            low_price_q64: 0,
+            close_price_q64: 0,
+            volume_base: 0,
+            volume_quote: 0,
+            integrator_fees: 0,
+            pool_fees_base: 0,
+            pool_fees_quote: 0,
+            n_swaps: 0,
+            n_chat_messages: 0,
+            starts_in_bonding_curve: false,
+            ends_in_bonding_curve: false,
+            tvl_per_lp_coin_growth_q64: tvl_per_lp_coin_growth_q64_2_3,
+        });
+        assert_periodic_state_tail_cumulative(mock_periodic_state_events, 1);
 
-//         // Advance timer to next 1 minute boundary.
-//         time = 4 * get_PERIOD_1M();
-//         timestamp::update_global_time_for_test(time);
+        // Advance timer to next 1 minute boundary.
+        time = 4 * get_PERIOD_1M();
+        timestamp::update_global_time_for_test(time);
 
-//         // Recalculate TVL per LP coin growth over the period.
-//         let tvl_to_lp_coin_ratio_4 = tvl_to_lp_coin_ratio();
-//         let tvl_per_lp_coin_growth_q64_3_4 = tvl_per_lp_coin_growth_q64_during_current_period(
-//             tvl_to_lp_coin_ratio_3,
-//             tvl_to_lp_coin_ratio_4,
-//         );
+        // Recalculate TVL per LP coin growth over the period.
+        let tvl_to_lp_coin_ratio_4 = tvl_to_lp_coin_ratio();
+        let tvl_per_lp_coin_growth_q64_3_4 = tvl_per_lp_coin_growth_q64_during_current_period(
+            tvl_to_lp_coin_ratio_3,
+            tvl_to_lp_coin_ratio_4,
+        );
 
-//         // Execute swap buy.
-//         let swap_buy_2_input_amount = coin::balance<AptosCoin>(EXACT_TRANSITION_USER);
-//         assert!(swap_buy_2_input_amount > 0, 0);
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             @black_cat_market,
-//             swap_buy_2_input_amount,
-//             SWAP_BUY,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
+        // Execute swap buy.
+        let swap_buy_2_input_amount = coin::balance<AptosCoin>(EXACT_TRANSITION_USER);
+        assert!(swap_buy_2_input_amount > 0, 0);
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            @black_cat_market,
+            swap_buy_2_input_amount,
+            SWAP_BUY,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
 
-//         // Get swap event data.
-//         let (
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             swap_buy_2_base_volume,
-//             swap_buy_2_quote_volume,
-//             swap_buy_2_price_q64,
-//             swap_buy_2_integrator_fee,
-//             swap_buy_2_base_pool_fee,
-//             _,
-//             _,
-//             _,
-//             _,
-//         ) = unpack_swap(vector::pop_back(&mut emitted_events<Swap>()));
-//         assert!(swap_buy_2_price_q64 > swap_sell_1_price_q64, 0);
+        // Get swap event data.
+        let (
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            swap_buy_2_base_volume,
+            swap_buy_2_quote_volume,
+            swap_buy_2_price_q64,
+            swap_buy_2_integrator_fee,
+            swap_buy_2_base_pool_fee,
+            _,
+            _,
+            _,
+            _,
+        ) = unpack_swap(vector::pop_back(&mut emitted_events<Swap>()));
+        assert!(swap_buy_2_price_q64 > swap_sell_1_price_q64, 0);
 
-//         // Verify the periodic state event.
-//         vector::push_back(&mut mock_periodic_state_events, MockPeriodicState {
-//             market_metadata: base_market_metadata(),
-//             periodic_state_metadata: MockPeriodicStateMetadata {
-//                 start_time: 3 * get_PERIOD_1M(),
-//                 period: get_PERIOD_1M(),
-//                 emit_time: 4 * get_PERIOD_1M(),
-//                 emit_market_nonce: 9,
-//                 trigger: get_TRIGGER_SWAP_BUY(),
-//             },
-//             open_price_q64: 0,
-//             high_price_q64: 0,
-//             low_price_q64: 0,
-//             close_price_q64: 0,
-//             volume_base: 0,
-//             volume_quote: 0,
-//             integrator_fees: 0,
-//             pool_fees_base: 0,
-//             pool_fees_quote: 0,
-//             n_swaps: 0,
-//             n_chat_messages: 0,
-//             starts_in_bonding_curve: false,
-//             ends_in_bonding_curve: false,
-//             tvl_per_lp_coin_growth_q64: tvl_per_lp_coin_growth_q64_3_4,
-//         });
-//         assert_periodic_state_tail_cumulative(mock_periodic_state_events, 1);
+        // Verify the periodic state event.
+        vector::push_back(&mut mock_periodic_state_events, MockPeriodicState {
+            market_metadata: base_market_metadata(),
+            periodic_state_metadata: MockPeriodicStateMetadata {
+                start_time: 3 * get_PERIOD_1M(),
+                period: get_PERIOD_1M(),
+                emit_time: 4 * get_PERIOD_1M(),
+                emit_market_nonce: 9,
+                trigger: get_TRIGGER_SWAP_BUY(),
+            },
+            open_price_q64: 0,
+            high_price_q64: 0,
+            low_price_q64: 0,
+            close_price_q64: 0,
+            volume_base: 0,
+            volume_quote: 0,
+            integrator_fees: 0,
+            pool_fees_base: 0,
+            pool_fees_quote: 0,
+            n_swaps: 0,
+            n_chat_messages: 0,
+            starts_in_bonding_curve: false,
+            ends_in_bonding_curve: false,
+            tvl_per_lp_coin_growth_q64: tvl_per_lp_coin_growth_q64_3_4,
+        });
+        assert_periodic_state_tail_cumulative(mock_periodic_state_events, 1);
 
-//         // Advance timer to next 1 minute boundary.
-//         time = 5 * get_PERIOD_1M();
-//         timestamp::update_global_time_for_test(time);
+        // Advance timer to next 1 minute boundary.
+        time = 5 * get_PERIOD_1M();
+        timestamp::update_global_time_for_test(time);
 
-//         // Recalculate TVL per LP coin growth over the period.
-//         let tvl_to_lp_coin_ratio_5 = tvl_to_lp_coin_ratio();
-//         let tvl_per_lp_coin_growth_q64_4_5 = tvl_per_lp_coin_growth_q64_during_current_period(
-//             tvl_to_lp_coin_ratio_4,
-//             tvl_to_lp_coin_ratio_5,
-//         );
+        // Recalculate TVL per LP coin growth over the period.
+        let tvl_to_lp_coin_ratio_5 = tvl_to_lp_coin_ratio();
+        let tvl_per_lp_coin_growth_q64_4_5 = tvl_per_lp_coin_growth_q64_during_current_period(
+            tvl_to_lp_coin_ratio_4,
+            tvl_to_lp_coin_ratio_5,
+        );
 
-//         // Execute swap sell.
-//         let swap_sell_2_input_amount = coin::balance<BlackCatEmojicoin>(EXACT_TRANSITION_USER);
-//         assert!(swap_sell_2_input_amount > 0, 0);
-//         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(EXACT_TRANSITION_USER),
-//             @black_cat_market,
-//             swap_sell_2_input_amount,
-//             SWAP_SELL,
-//             INTEGRATOR,
-//             INTEGRATOR_FEE_RATE_BPS,
-//             1,
-//         );
+        // Execute swap sell.
+        let swap_sell_2_input_amount = coin::balance<BlackCatEmojicoin>(EXACT_TRANSITION_USER);
+        assert!(swap_sell_2_input_amount > 0, 0);
+        swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(EXACT_TRANSITION_USER),
+            @black_cat_market,
+            swap_sell_2_input_amount,
+            SWAP_SELL,
+            INTEGRATOR,
+            INTEGRATOR_FEE_RATE_BPS,
+            1,
+        );
 
-//         // Get swap event data.
-//         let (
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//             swap_sell_2_quote_volume,
-//             swap_sell_2_price_q64,
-//             swap_sell_2_integrator_fee,
-//             _,
-//             _,
-//             _,
-//             _,
-//             _,
-//         ) = unpack_swap(vector::pop_back(&mut emitted_events<Swap>()));
-//         assert!(swap_sell_2_price_q64 < swap_buy_2_price_q64, 0);
+        // Get swap event data.
+        let (
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            swap_sell_2_quote_volume,
+            swap_sell_2_price_q64,
+            swap_sell_2_integrator_fee,
+            _,
+            _,
+            _,
+            _,
+            _,
+        ) = unpack_swap(vector::pop_back(&mut emitted_events<Swap>()));
+        assert!(swap_sell_2_price_q64 < swap_buy_2_price_q64, 0);
 
-//         // Verify the two new periodic state events.
-//         vector::push_back(&mut mock_periodic_state_events, MockPeriodicState {
-//             market_metadata: base_market_metadata(),
-//             periodic_state_metadata: MockPeriodicStateMetadata {
-//                 start_time: 4 * get_PERIOD_1M(),
-//                 period: get_PERIOD_1M(),
-//                 emit_time: get_PERIOD_5M(),
-//                 emit_market_nonce: 10,
-//                 trigger: get_TRIGGER_SWAP_SELL(),
-//             },
-//             open_price_q64: swap_buy_2_price_q64,
-//             high_price_q64: swap_buy_2_price_q64,
-//             low_price_q64: swap_buy_2_price_q64,
-//             close_price_q64: swap_buy_2_price_q64,
-//             volume_base: (swap_buy_2_base_volume as u128),
-//             volume_quote: (swap_buy_2_quote_volume as u128),
-//             integrator_fees: (swap_buy_2_integrator_fee as u128),
-//             pool_fees_base: (swap_buy_2_base_pool_fee as u128),
-//             pool_fees_quote: 0,
-//             n_swaps: 1,
-//             n_chat_messages: 0,
-//             starts_in_bonding_curve: false,
-//             ends_in_bonding_curve: false,
-//             tvl_per_lp_coin_growth_q64: tvl_per_lp_coin_growth_q64_4_5,
-//         });
-//         vector::push_back(&mut mock_periodic_state_events, MockPeriodicState {
-//             market_metadata: base_market_metadata(),
-//             periodic_state_metadata: MockPeriodicStateMetadata {
-//                 start_time: 0,
-//                 period: get_PERIOD_5M(),
-//                 emit_time: get_PERIOD_5M(),
-//                 emit_market_nonce: 10,
-//                 trigger: get_TRIGGER_SWAP_SELL(),
-//             },
-//             open_price_q64: exact_transition_price,
-//             high_price_q64: swap_buy_2_price_q64,
-//             low_price_q64: exact_transition_price,
-//             close_price_q64: swap_buy_2_price_q64,
-//             volume_base: (
-//                 (exact_transition_swap_event.base_volume as u128) +
-//                 (swap_buy_1_base_volume as u128) +
-//                 (swap_sell_1_base_volume as u128) +
-//                 (swap_buy_2_base_volume as u128)
-//             ),
-//             volume_quote: (
-//                 (exact_transition_swap_event.quote_volume as u128) +
-//                 (swap_buy_1_quote_volume as u128) +
-//                 (swap_sell_1_quote_volume as u128) +
-//                 (swap_buy_2_quote_volume as u128)
-//             ),
-//             integrator_fees: (
-//                 (swap_buy_1_integrator_fee as u128) +
-//                 (swap_sell_1_integrator_fee as u128) +
-//                 (swap_buy_2_integrator_fee as u128)
-//             ),
-//             pool_fees_base: (
-//                 (swap_buy_1_base_pool_fee as u128) +
-//                 (swap_buy_2_base_pool_fee as u128)
-//             ),
-//             pool_fees_quote: (swap_sell_1_quote_pool_fee as u128),
-//             n_swaps: 4,
-//             n_chat_messages: 1,
-//             starts_in_bonding_curve: true,
-//             ends_in_bonding_curve: false,
-//             tvl_per_lp_coin_growth_q64: 0,
-//         });
-//         assert_periodic_state_tail_cumulative(mock_periodic_state_events, 2);
+        // Verify the two new periodic state events.
+        vector::push_back(&mut mock_periodic_state_events, MockPeriodicState {
+            market_metadata: base_market_metadata(),
+            periodic_state_metadata: MockPeriodicStateMetadata {
+                start_time: 4 * get_PERIOD_1M(),
+                period: get_PERIOD_1M(),
+                emit_time: get_PERIOD_5M(),
+                emit_market_nonce: 10,
+                trigger: get_TRIGGER_SWAP_SELL(),
+            },
+            open_price_q64: swap_buy_2_price_q64,
+            high_price_q64: swap_buy_2_price_q64,
+            low_price_q64: swap_buy_2_price_q64,
+            close_price_q64: swap_buy_2_price_q64,
+            volume_base: (swap_buy_2_base_volume as u128),
+            volume_quote: (swap_buy_2_quote_volume as u128),
+            integrator_fees: (swap_buy_2_integrator_fee as u128),
+            pool_fees_base: (swap_buy_2_base_pool_fee as u128),
+            pool_fees_quote: 0,
+            n_swaps: 1,
+            n_chat_messages: 0,
+            starts_in_bonding_curve: false,
+            ends_in_bonding_curve: false,
+            tvl_per_lp_coin_growth_q64: tvl_per_lp_coin_growth_q64_4_5,
+        });
+        vector::push_back(&mut mock_periodic_state_events, MockPeriodicState {
+            market_metadata: base_market_metadata(),
+            periodic_state_metadata: MockPeriodicStateMetadata {
+                start_time: 0,
+                period: get_PERIOD_5M(),
+                emit_time: get_PERIOD_5M(),
+                emit_market_nonce: 10,
+                trigger: get_TRIGGER_SWAP_SELL(),
+            },
+            open_price_q64: exact_transition_price,
+            high_price_q64: swap_buy_2_price_q64,
+            low_price_q64: exact_transition_price,
+            close_price_q64: swap_buy_2_price_q64,
+            volume_base: (
+                (exact_transition_swap_event.base_volume as u128) +
+                (swap_buy_1_base_volume as u128) +
+                (swap_sell_1_base_volume as u128) +
+                (swap_buy_2_base_volume as u128)
+            ),
+            volume_quote: (
+                (exact_transition_swap_event.quote_volume as u128) +
+                (swap_buy_1_quote_volume as u128) +
+                (swap_sell_1_quote_volume as u128) +
+                (swap_buy_2_quote_volume as u128)
+            ),
+            integrator_fees: (
+                (get_MARKET_REGISTRATION_DEPOSIT() as u128) +
+                (swap_buy_1_integrator_fee as u128) +
+                (swap_sell_1_integrator_fee as u128) +
+                (swap_buy_2_integrator_fee as u128)
+            ),
+            pool_fees_base: (
+                (swap_buy_1_base_pool_fee as u128) +
+                (swap_buy_2_base_pool_fee as u128)
+            ),
+            pool_fees_quote: (swap_sell_1_quote_pool_fee as u128),
+            n_swaps: 4,
+            n_chat_messages: 1,
+            starts_in_bonding_curve: true,
+            ends_in_bonding_curve: false,
+            tvl_per_lp_coin_growth_q64: 0,
+        });
 
-//         // Advance timer 1 microsecond, register a new market.
-//         time = time + 1;
-//         timestamp::update_global_time_for_test(time);
-//  init_market(b"Stop War", b"SW");
-//         // Advance timer to next 1 day boundary, register a new market.
-//         time = get_PERIOD_1D();
-//         timestamp::update_global_time_for_test(time);
+        assert_periodic_state_tail_cumulative(mock_periodic_state_events, 2);
+        // Advance timer 1 microsecond, register a new market.
+        time = time + 1;
+        timestamp::update_global_time_for_test(time);
+ init_market(END_HUNGER_TITLE, END_HUNGER_SYMBOL);
+        // Advance timer to next 1 day boundary, register a new market.
+        time = get_PERIOD_1D();
+        timestamp::update_global_time_for_test(time);
         
-//  init_market(b"Fight Climate Change", b"FCC");
-//         // Chat on original market, thus resetting periodic state trackers.
-//         chat<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             @black_cat_market,
-//        b"Hello World"
-//         );
+ init_market(STOP_WAR_TITLE, STOP_WAR_SYMBOL);
+        // Chat on original market, thus resetting periodic state trackers.
+        chat<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            @black_cat_market,
+       b"Hello World"
+        );
 
-//         // Get market cap, FDV of first market.
-//         let ( _, _, _, _, _, _, _, instantaneous_stats, _, _, _, _, _,) = unpack_market_view(
-//             market_view<BlackCatEmojicoin, BlackCatEmojicoinLP>(@black_cat_market)
-//         );
-//         let (_, _, market_cap_market_1, fdv_market_1) =
-//             unpack_instantaneous_stats(instantaneous_stats);
+        // Get market cap, FDV of first market.
+        let ( _, _, _, _, _, _, _, instantaneous_stats, _, _, _, _, _,) = unpack_market_view(
+            market_view<BlackCatEmojicoin, BlackCatEmojicoinLP>(@black_cat_market)
+        );
+        let (_, _, market_cap_market_1, fdv_market_1) =
+            unpack_instantaneous_stats(instantaneous_stats);
+        // Verify two global state events triggered, one for publication and one for period lapse.
+        let global_state_events = emitted_events<GlobalState>();
+        assert!(vector::length(&global_state_events) == 2, 0); 
+        assert_global_state(
+            MockGlobalState {
+                emit_time: get_PERIOD_1D(),
+                registry_nonce: 13,
+                trigger: get_TRIGGER_MARKET_REGISTRATION(),
+                cumulative_quote_volume: (
+                    (exact_transition_swap_event.quote_volume as u128) +
+                    (swap_buy_1_quote_volume as u128) +
+                    (swap_sell_1_quote_volume as u128) +
+                    (swap_buy_2_quote_volume as u128) +
+                    (swap_sell_2_quote_volume as u128)
+                ),
+                total_quote_locked: (coin::balance<AptosCoin>(@black_cat_market) as u128),
+                total_value_locked: 2 * (coin::balance<AptosCoin>(@black_cat_market) as u128),
+                market_cap: market_cap_market_1,
+                fully_diluted_value:
+                    ((fdv_market_1 + fdv_for_newly_registered_market()) as u128),
+                cumulative_integrator_fees: (
+                    (swap_buy_1_integrator_fee as u128) +
+                    (swap_sell_1_integrator_fee as u128) +
+                    (swap_buy_2_integrator_fee as u128) +
+                    (swap_sell_2_integrator_fee as u128) +
+                    2 * (get_MARKET_REGISTRATION_FEE() as u128)
+                ),
+                cumulative_swaps: 5,
+                cumulative_chat_messages: 1,
+            },
+            vector::pop_back(&mut global_state_events),
+        );
 
-//         // Verify two global state events triggered, one for publication and one for period lapse.
-//         let global_state_events = emitted_events<GlobalState>();
-//         assert!(vector::length(&global_state_events) == 2, 0);
-//         assert_global_state(
-//             MockGlobalState {
-//                 emit_time: get_PERIOD_1D(),
-//                 registry_nonce: 13,
-//                 trigger: get_TRIGGER_MARKET_REGISTRATION(),
-//                 cumulative_quote_volume: (
-//                     (exact_transition_swap_event.quote_volume as u128) +
-//                     (swap_buy_1_quote_volume as u128) +
-//                     (swap_sell_1_quote_volume as u128) +
-//                     (swap_buy_2_quote_volume as u128) +
-//                     (swap_sell_2_quote_volume as u128)
-//                 ),
-//                 total_quote_locked: (coin::balance<AptosCoin>(@black_cat_market) as u128),
-//                 total_value_locked: 2 * (coin::balance<AptosCoin>(@black_cat_market) as u128),
-//                 market_cap: market_cap_market_1,
-//                 fully_diluted_value:
-//                     ((fdv_market_1 + fdv_for_newly_registered_market()) as u128),
-//                 cumulative_integrator_fees: (
-//                     (swap_buy_1_integrator_fee as u128) +
-//                     (swap_sell_1_integrator_fee as u128) +
-//                     (swap_buy_2_integrator_fee as u128) +
-//                     (swap_sell_2_integrator_fee as u128) +
-//                     1 * (get_MARKET_REGISTRATION_FEE() as u128)
-//                 ),
-//                 cumulative_swaps: 5,
-//                 cumulative_chat_messages: 1,
-//             },
-//             vector::pop_back(&mut global_state_events),
-//         );
+        // Advance timer to next 1 day boundary, chat on original market.
+        time = 2 * get_PERIOD_1D();
+        timestamp::update_global_time_for_test(time);
+        chat<BlackCatEmojicoin, BlackCatEmojicoinLP>(
+            &get_signer(USER),
+            @black_cat_market,
+          b"Hello World"
+        );
 
-//         // Advance timer to next 1 day boundary, chat on original market.
-//         time = 2 * get_PERIOD_1D();
-//         timestamp::update_global_time_for_test(time);
-//         chat<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-//             &get_signer(USER),
-//             @black_cat_market,
-//           b"Hello World"
-//         );
+        // Verify another global state event triggered.
+        let global_state_events = emitted_events<GlobalState>();
+        assert!(vector::length(&global_state_events) == 3, 0);
+ 
+        assert_global_state(
+            MockGlobalState {
+                emit_time: 2 * get_PERIOD_1D(),
+                registry_nonce: 15,
+                trigger: get_TRIGGER_CHAT(),
+                cumulative_quote_volume: (
+                    (exact_transition_swap_event.quote_volume as u128) +
+                    (swap_buy_1_quote_volume as u128) +
+                    (swap_sell_1_quote_volume as u128) +
+                    (swap_buy_2_quote_volume as u128) +
+                    (swap_sell_2_quote_volume as u128)
+                ),
+                total_quote_locked: (coin::balance<AptosCoin>(@black_cat_market) as u128),
+                total_value_locked: 2 * (coin::balance<AptosCoin>(@black_cat_market) as u128),
+                market_cap: market_cap_market_1,
+                fully_diluted_value:
+                    ((fdv_market_1 + 2 * fdv_for_newly_registered_market()) as u128),
+                cumulative_integrator_fees: (
+                    (swap_buy_1_integrator_fee as u128) +
+                    (swap_sell_1_integrator_fee as u128) +
+                    (swap_buy_2_integrator_fee as u128) +
+                    (swap_sell_2_integrator_fee as u128) +
+                    3 * (get_MARKET_REGISTRATION_FEE() as u128)
+                ),
+                cumulative_swaps: 5,
+                cumulative_chat_messages: 2,
+            },
+            vector::pop_back(&mut global_state_events),
+        );
 
-//         // Verify another global state event triggered.
-//         let global_state_events = emitted_events<GlobalState>();
-//         assert!(vector::length(&global_state_events) == 3, 0);
-//         assert_global_state(
-//             MockGlobalState {
-//                 emit_time: 2 * get_PERIOD_1D(),
-//                 registry_nonce: 15,
-//                 trigger: get_TRIGGER_CHAT(),
-//                 cumulative_quote_volume: (
-//                     (exact_transition_swap_event.quote_volume as u128) +
-//                     (swap_buy_1_quote_volume as u128) +
-//                     (swap_sell_1_quote_volume as u128) +
-//                     (swap_buy_2_quote_volume as u128) +
-//                     (swap_sell_2_quote_volume as u128)
-//                 ),
-//                 total_quote_locked: (coin::balance<AptosCoin>(@black_cat_market) as u128),
-//                 total_value_locked: 2 * (coin::balance<AptosCoin>(@black_cat_market) as u128),
-//                 market_cap: market_cap_market_1,
-//                 fully_diluted_value:
-//                     ((fdv_market_1 + 2 * fdv_for_newly_registered_market()) as u128),
-//                 cumulative_integrator_fees: (
-//                     (swap_buy_1_integrator_fee as u128) +
-//                     (swap_sell_1_integrator_fee as u128) +
-//                     (swap_buy_2_integrator_fee as u128) +
-//                     (swap_sell_2_integrator_fee as u128) +
-//                     2 * (get_MARKET_REGISTRATION_FEE() as u128)
-//                 ),
-//                 cumulative_swaps: 5,
-//                 cumulative_chat_messages: 2,
-//             },
-//             vector::pop_back(&mut global_state_events),
-//         );
+        // Verify that all periodic state trackers are triggered accordingly.
+        let mock_periodic_state = MockPeriodicState {
+            market_metadata: base_market_metadata(),
+            periodic_state_metadata: MockPeriodicStateMetadata {
+                start_time: get_PERIOD_1D(),
+                period: 0,
+                emit_time: 2 * get_PERIOD_1D(),
+                emit_market_nonce: 12,
+                trigger: get_TRIGGER_CHAT(),
+            },
+            open_price_q64: 0,
+            high_price_q64: 0,
+            low_price_q64: 0,
+            close_price_q64: 0,
+            volume_base: 0,
+            volume_quote: 0,
+            integrator_fees: 0,
+            pool_fees_base: 0,
+            pool_fees_quote: 0,
+            n_swaps: 0,
+            n_chat_messages: 1,
+            starts_in_bonding_curve: false,
+            ends_in_bonding_curve: false,
+            tvl_per_lp_coin_growth_q64: 1 << 64,
+        };
+        let periods = vector[
+            get_PERIOD_1M(),
+            get_PERIOD_5M(),
+            get_PERIOD_15M(),
+            get_PERIOD_30M(),
+            get_PERIOD_1H(),
+            get_PERIOD_4H(),
+            get_PERIOD_1D(),
+        ];
+        let n_periods = vector::length(&periods);
+        for (i in 0..n_periods) {
+            // Push back 7 mock periodic state events into the ongoing mock events vector, so that
+            // the check for the number of emitted events is correct. Earlier parts of this test
+            // case already verified the associated periodic state trigger operations that inform
+            // values in these mock periodic state events, so their values are not asserted here.
+            // Rather, only the final 7 events are asserted below, representing the periodic state
+            // trackers that were reset at the 1 day boundary, to verify that they are all identical
+            // except for start time.
+            vector::push_back(&mut mock_periodic_state_events, mock_periodic_state);
+        };
+        vector::for_each(periods, |period| {
+            let new_periodic_state = copy mock_periodic_state;
+            new_periodic_state.periodic_state_metadata.start_time = get_PERIOD_1D();
+            new_periodic_state.periodic_state_metadata.period = period;
+            vector::push_back(&mut mock_periodic_state_events, new_periodic_state);
+        });
+        assert_periodic_state_tail_cumulative(mock_periodic_state_events, n_periods);
+    }
 
-//         // Verify that all periodic state trackers are triggered accordingly.
-//         let mock_periodic_state = MockPeriodicState {
-//             market_metadata: base_market_metadata(),
-//             periodic_state_metadata: MockPeriodicStateMetadata {
-//                 start_time: get_PERIOD_1D(),
-//                 period: 0,
-//                 emit_time: 2 * get_PERIOD_1D(),
-//                 emit_market_nonce: 12,
-//                 trigger: get_TRIGGER_CHAT(),
-//             },
-//             open_price_q64: 0,
-//             high_price_q64: 0,
-//             low_price_q64: 0,
-//             close_price_q64: 0,
-//             volume_base: 0,
-//             volume_quote: 0,
-//             integrator_fees: 0,
-//             pool_fees_base: 0,
-//             pool_fees_quote: 0,
-//             n_swaps: 0,
-//             n_chat_messages: 1,
-//             starts_in_bonding_curve: false,
-//             ends_in_bonding_curve: false,
-//             tvl_per_lp_coin_growth_q64: 1 << 64,
-//         };
-//         let periods = vector[
-//             get_PERIOD_1M(),
-//             get_PERIOD_5M(),
-//             get_PERIOD_15M(),
-//             get_PERIOD_30M(),
-//             get_PERIOD_1H(),
-//             get_PERIOD_4H(),
-//             get_PERIOD_1D(),
-//         ];
-//         let n_periods = vector::length(&periods);
-//         for (i in 0..n_periods) {
-//             // Push back 7 mock periodic state events into the ongoing mock events vector, so that
-//             // the check for the number of emitted events is correct. Earlier parts of this test
-//             // case already verified the associated periodic state trigger operations that inform
-//             // values in these mock periodic state events, so their values are not asserted here.
-//             // Rather, only the final 7 events are asserted below, representing the periodic state
-//             // trackers that were reset at the 1 day boundary, to verify that they are all identical
-//             // except for start time.
-//             vector::push_back(&mut mock_periodic_state_events, mock_periodic_state);
-//         };
-//         vector::for_each(periods, |period| {
-//             let new_periodic_state = copy mock_periodic_state;
-//             new_periodic_state.periodic_state_metadata.start_time = get_PERIOD_1D();
-//             new_periodic_state.periodic_state_metadata.period = period;
-//             vector::push_back(&mut mock_periodic_state_events, new_periodic_state);
-//         });
-//         assert_periodic_state_tail_cumulative(mock_periodic_state_events, n_periods);
-//     }
+    #[test] fun tvl_clamm_expected() {
+        assert_tvl_clamm(
+            MockReserves{
+                base: get_BASE_VIRTUAL_CEILING(),
+                quote: get_QUOTE_VIRTUAL_FLOOR(),
+            },
+            0,
+        );
 
-//     #[test] fun tvl_clamm_expected() {
-//         assert_tvl_clamm(
-//             MockReserves{
-//                 base: get_BASE_VIRTUAL_CEILING(),
-//                 quote: get_QUOTE_VIRTUAL_FLOOR(),
-//             },
-//             0,
-//         );
+        let base_out = 10;
+        let quote_in = 50;
+        let reserves = MockReserves{
+            base: get_BASE_VIRTUAL_CEILING() - base_out,
+            quote: get_QUOTE_VIRTUAL_FLOOR() + quote_in,
+        };
+        let base_real_in_bonding_curve = get_BASE_REAL_CEILING() - base_out;
+        let base_locked = base_real_in_bonding_curve + get_EMOJICOIN_REMAINDER();
+        let base_denominated_in_quote =
+            ((base_locked as u128) * (reserves.quote as u128)) / (reserves.base as u128);
+        assert_tvl_clamm(
+            reserves,
+            (quote_in as u128) + base_denominated_in_quote,
+        );
+    }
 
-//         let base_out = 10;
-//         let quote_in = 50;
-//         let reserves = MockReserves{
-//             base: get_BASE_VIRTUAL_CEILING() - base_out,
-//             quote: get_QUOTE_VIRTUAL_FLOOR() + quote_in,
-//         };
-//         let base_real_in_bonding_curve = get_BASE_REAL_CEILING() - base_out;
-//         let base_locked = base_real_in_bonding_curve + get_EMOJICOIN_REMAINDER();
-//         let base_denominated_in_quote =
-//             ((base_locked as u128) * (reserves.quote as u128)) / (reserves.base as u128);
-//         assert_tvl_clamm(
-//             reserves,
-//             (quote_in as u128) + base_denominated_in_quote,
-//         );
-//     }
+    #[test] fun valid_coin_types_all_invalid() {
+        // Duplicate types should be invalid.
+        assert!(!valid_coin_types<BlackCatEmojicoin, BlackCatEmojicoin>(@emojicoin_dot_fun), 0);
+        // Duplicate LP types should be invalid.
+        assert!(!valid_coin_types<BlackCatEmojicoinLP, BlackCatEmojicoinLP>(@emojicoin_dot_fun), 0);
+        // A bad Movementcoin type should be invalid.
+        assert!(!valid_coin_types<BadType, BlackCatEmojicoinLP>(@emojicoin_dot_fun), 0);
+        // A bad MovementcoinLP type should be invalid.
+        assert!(!valid_coin_types<BlackCatEmojicoin, BadType>(@emojicoin_dot_fun), 0);
+        // Backwards coin types that are otherwise valid should be invalid.
+        assert!(!valid_coin_types<BlackCatEmojicoinLP, BlackCatEmojicoin>(@emojicoin_dot_fun), 0);
+        // A market address that doesn't match the types should be invalid.
+        assert!(!valid_coin_types<BlackCatEmojicoin, BlackCatEmojicoinLP>(@0xc1de), 0);
+    }
 
-//     #[test] fun valid_coin_types_all_invalid() {
-//         // Duplicate types should be invalid.
-//         assert!(!valid_coin_types<BlackCatEmojicoin, BlackCatEmojicoin>(@emojicoin_dot_fun), 0);
-//         // Duplicate LP types should be invalid.
-//         assert!(!valid_coin_types<BlackCatEmojicoinLP, BlackCatEmojicoinLP>(@emojicoin_dot_fun), 0);
-//         // A bad Movementcoin type should be invalid.
-//         assert!(!valid_coin_types<BadType, BlackCatEmojicoinLP>(@emojicoin_dot_fun), 0);
-//         // A bad MovementcoinLP type should be invalid.
-//         assert!(!valid_coin_types<BlackCatEmojicoin, BadType>(@emojicoin_dot_fun), 0);
-//         // Backwards coin types that are otherwise valid should be invalid.
-//         assert!(!valid_coin_types<BlackCatEmojicoinLP, BlackCatEmojicoin>(@emojicoin_dot_fun), 0);
-//         // A market address that doesn't match the types should be invalid.
-//         assert!(!valid_coin_types<BlackCatEmojicoin, BlackCatEmojicoinLP>(@0xc1de), 0);
-//     }
-
-//     #[test] fun valid_coin_types_all_valid() {
-//         assert!(
-//             valid_coin_types<YellowHeartEmojicoin, YellowHeartEmojicoinLP>(@yellow_heart_market) &&
-//             valid_coin_types<BlackHeartEmojicoin, BlackHeartEmojicoinLP>(@black_heart_market) &&
-//             valid_coin_types<BlackCatEmojicoin, BlackCatEmojicoinLP>(@black_cat_market),
-//             0
-//         );
-//     }
+    #[test] fun valid_coin_types_all_valid() {
+        assert!(
+            valid_coin_types<YellowHeartEmojicoin, YellowHeartEmojicoinLP>(@yellow_heart_market) &&
+            valid_coin_types<BlackHeartEmojicoin, BlackHeartEmojicoinLP>(@black_heart_market) &&
+            valid_coin_types<BlackCatEmojicoin, BlackCatEmojicoinLP>(@black_cat_market),
+            0
+        );
+    }
 
 //     // #[test, expected_failure(
 //     //     abort_code = emojicoin_dot_fun::emojicoin_dot_fun::E_EMOJI_BYTES_EMPTY,
