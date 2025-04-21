@@ -1156,7 +1156,7 @@ if (!coin::is_account_registered<AptosCoin>(market_address)) {
             cumulative_chat_messages,
         )
     }
-//TODO: market_metadata_by_symbol_bytes change this to market_metadata_by_symbol_bytes
+
     #[view]
     public fun market_metadata_by_symbol_bytes(symbol: vector<u8>): Option<MarketMetadata>
     acquires Market, Registry, RegistryAddress {
