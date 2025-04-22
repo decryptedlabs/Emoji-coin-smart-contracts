@@ -18,7 +18,7 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
     use std::signer;
     use std::string::{Self, String}; 
     use std::vector;
-    use aptos_std::debug;
+    // use aptos_std::debug;
 
 
 
