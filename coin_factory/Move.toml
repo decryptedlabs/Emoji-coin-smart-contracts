@@ -1,5 +1,6 @@
 [addresses]
 coin_factory = "_"
+# coin_factory = "0x5df39f893dcbb17631cff37a0b7b848d0397deb2ec23228213fd1245510aedd9"
 
 [dev-dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-core.git"

@@ -1,6 +1,6 @@
 [addresses]
-emojicoin_dot_fun = "_"
-# emojicoin_dot_fun = "0x5df39f893dcbb17631cff37a0b7b848d0397deb2ec23228213fd1245510aedd9"
+# emojicoin_dot_fun = "_"
+emojicoin_dot_fun = "0x796d627c580d8ee35e556e18730822d6fcd1bf350517f37d3132747e4fe293fd"
 
 [dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-core.git"
@@ -11,8 +11,6 @@ subdir = "aptos-move/framework/aptos-framework"
 [dev-addresses]
 coin_factory = "0xaaaa"
 emojicoin_dot_fun = "0xc0de"    
-# coin_factory = "0x5df39f893dcbb17631cff37a0b7b848d0397deb2ec23228213fd1245510aedd9"
-# emojicoin_dot_fun = "0x5df39f893dcbb17631cff37a0b7b848d0397deb2ec23228213fd1245510aedd9"
 
 [dev-dependencies.BlackCatCoinFactory]
 local = "../test_coin_factories/black_cat"

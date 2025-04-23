@@ -37,3 +37,44 @@ Without Docker
 aptos move compile --dev
 aptos move test --dev
 aptos node run-local-testnet --with-faucet
+
+Start Aptos Localnet
+aptos node run-local-testnet --with-faucet --force-restart
+
+Create a local account
+aptos init (This creates .aptos/config.yaml with keys and localnet settings)
+
+Fund your account from the local faucet
+aptos account fund-with-faucet --account default
+Fund your account from the devnet faucet
+aptos account fund-with-faucet --profile devnet --amount 50000
+
+Build your Move contract
+aptos move compile
+
+Publish to localnet
+aptos move publish --override-size-check --assume-yes --included-artifacts none --max-gas 1000000
+
+Publish to devnet
+aptos move publish \
+  --assume-yes \
+  --included-artifacts=none \
+  --max-gas 2000000 \
+  --named-addresses emojicoin_dot_fun=0x796d627c580d8ee35e556e18730822d6fcd1bf350517f37d3132747e4fe293fd \
+  --profile emojicoin-devnet-2 \
+  --override-size-check
+
+
+Call register_market function 
+aptos move run \
+  --function-id 0x796d627c580d8ee35e556e18730822d6fcd1bf350517f37d3132747e4fe293fd::emojicoin_dot_fun::register_market \
+  --args \
+    hex:4d6f6e65794d757474 \   
+    hex:4d757474 \
+    address:0x5df39f893dcbb17631cff37a0b7b848d0397deb2ec23228213fd1245510aedd9 \
+  --profile emojicoin-devnet-2
+
+hex to string:
+4d6f6e65794d757474 = MoneyMutt
+4d757474 = Mutt
+
