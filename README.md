@@ -76,7 +76,7 @@ aptos move run \
     address:0x5df39f893dcbb17631cff37a0b7b848d0397deb2ec23228213fd1245510aedd9 \
   --profile emojicoin-devnet-3
 
-call swap function 
+call swap function to buy tokens
 aptos move run \
   --function-id 0xb066504f60719b6c53714c7a8d06a6ee6bb1a79994a2e53175c3ffb7b6ce7e99::emojicoin_dot_fun::swap \
   --type-args \
@@ -90,6 +90,22 @@ aptos move run \
     u8:0 \
     u64:1 \
   --profile emojicoin-devnet-3
+
+  call swap function to sell tokens
+aptos move run \
+  --function-id 0xb066504f60719b6c53714c7a8d06a6ee6bb1a79994a2e53175c3ffb7b6ce7e99::emojicoin_dot_fun::swap \
+  --type-args \
+    0xead62d136413c4ca37c625994532a2168b5e660c1fa4176897b68fcbde8bb4b0::coin_factory::Movementcoin \
+    0xead62d136413c4ca37c625994532a2168b5e660c1fa4176897b68fcbde8bb4b0::coin_factory::MovementcoinLP \
+  --args \
+    address:0xead62d136413c4ca37c625994532a2168b5e660c1fa4176897b68fcbde8bb4b0 \
+    u64:10000000000 \
+    bool:true \
+    address:0x5df39f893dcbb17631cff37a0b7b848d0397deb2ec23228213fd1245510aedd9 \
+    u8:0 \
+    u64:1 \
+  --profile emojicoin-devnet-3
+
 
 hex to string:
 4d6f6e65794d757474 = MoneyMutt
