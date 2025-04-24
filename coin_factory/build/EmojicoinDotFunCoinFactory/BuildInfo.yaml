@@ -3,7 +3,7 @@ compiled_package_info:
   package_name: EmojicoinDotFunCoinFactory
   address_alias_instantiation:
     coin_factory: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
-  source_digest: 57D5D001A561AAE0651A537922798B3E60140FD0500D7EACFDDA0A3B5599CB9D
+  source_digest: 19EF64482E901636B6612D5D595B773CC8D078D5D60599AF61771FFCE01CB9AD
   build_flags:
     dev_mode: false
     test_mode: false

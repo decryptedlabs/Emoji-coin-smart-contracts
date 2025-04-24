@@ -1,6 +1,6 @@
 [addresses]
 # emojicoin_dot_fun = "_"
-emojicoin_dot_fun = "0x796d627c580d8ee35e556e18730822d6fcd1bf350517f37d3132747e4fe293fd"
+emojicoin_dot_fun = "0xb066504f60719b6c53714c7a8d06a6ee6bb1a79994a2e53175c3ffb7b6ce7e99"
 
 [dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-core.git"

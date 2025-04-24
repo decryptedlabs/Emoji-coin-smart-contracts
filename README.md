@@ -44,6 +44,8 @@ aptos node run-local-testnet --with-faucet --force-restart
 Create a local account
 aptos init (This creates .aptos/config.yaml with keys and localnet settings)
 
+aptos account list --profile emojicoin-devnet-(pass number here)
+
 Fund your account from the local faucet
 aptos account fund-with-faucet --account default
 Fund your account from the devnet faucet

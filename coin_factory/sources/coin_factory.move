@@ -1,5 +1,4 @@
 module coin_factory::coin_factory {
-    struct Movementcoin {}
-    struct MovementcoinLP {}
-}
-
+        struct Movementcoin has store, copy, drop {}
+        struct MovementcoinLP has store, copy, drop {}
+    }
