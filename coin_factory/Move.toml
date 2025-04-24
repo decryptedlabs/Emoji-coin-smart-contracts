@@ -1,6 +1,5 @@
 [addresses]
 coin_factory = "_"
-# coin_factory = "0xdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
 
 [dev-dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-core.git"
