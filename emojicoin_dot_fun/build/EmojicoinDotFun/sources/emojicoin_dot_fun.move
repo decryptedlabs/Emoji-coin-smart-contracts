@@ -150,7 +150,7 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
         sequence_info: ParallelizableSequenceInfo,
         coin_symbol_emojis: Table<vector<u8>, u8>,
         supplemental_chat_emojis: Table<vector<u8>, u8>,
-        markets_by_symbol: SmartTable<vector<u8>, address>,
+        markets_by_emoji_bytes: SmartTable<vector<u8>, address>,
         markets_by_market_id: SmartTable<u64, address>,
         extend_ref: ExtendRef,
         global_stats: GlobalStats,
@@ -366,8 +366,7 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
     struct MarketMetadata has copy, drop, store {
         market_id: u64,
         market_address: address,
-        title: vector<u8>,
-        symbol: vector<u8>,
+        emoji_bytes: vector<u8>
     }
 
     struct ParallelizableSequenceInfo has drop, store {
@@ -426,12 +425,13 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
 
 public entry fun register_market(
     registrant: &signer,
-    title: vector<u8>,
-    symbol: vector<u8>,
+    emojis: vector<vector<u8>>,
     integrator: address,
 ) acquires Market, Registry, RegistryAddress {
-    register_market_inner(registrant, title, symbol, integrator, true);
+    let title = *vector::borrow(&emojis, 0);
+    register_market_inner(registrant, title, integrator, true);
 }
+
 
     public entry fun swap<Movementcoin, MovementcoinLP>(
         swapper: &signer,
@@ -1115,12 +1115,12 @@ if (!coin::is_account_registered<AptosCoin>(market_address)) {
     }
 
     #[view]
-    public fun market_metadata_by_symbol_bytes(symbol: vector<u8>): Option<MarketMetadata>
+    public fun market_metadata_by_emoji_bytes(emoji_bytes: vector<u8>): Option<MarketMetadata>
     acquires Market, Registry, RegistryAddress {
         let registry_ref = borrow_registry_ref();
-        let markets_by_emoji_bytes_ref = &registry_ref.markets_by_symbol;
-        if (smart_table::contains(markets_by_emoji_bytes_ref, symbol)) {
-            let market_address = *smart_table::borrow(markets_by_emoji_bytes_ref, symbol);
+        let markets_by_emoji_bytes_ref = &registry_ref.markets_by_emoji_bytes;
+        if (smart_table::contains(markets_by_emoji_bytes_ref, emoji_bytes)) {
+            let market_address = *smart_table::borrow(markets_by_emoji_bytes_ref, emoji_bytes);
             option::some(borrow_global<Market>(market_address).metadata)
         } else {
             option::none()
@@ -1154,15 +1154,13 @@ if (!coin::is_account_registered<AptosCoin>(market_address)) {
         u64,
         address,
         vector<u8>,
-        vector<u8>,
     ) {
         let MarketMetadata {
             market_id,
             market_address,
-            title,
-            symbol,
+            emoji_bytes
         } = metadata;
-        (market_id, market_address, title, symbol)
+        (market_id, market_address, emoji_bytes)
     }
 
     #[view]
@@ -1552,7 +1550,7 @@ if (!coin::is_account_registered<AptosCoin>(market_address)) {
             },
             coin_symbol_emojis: table::new(),
             supplemental_chat_emojis: table::new(),
-            markets_by_symbol: smart_table::new(),
+            markets_by_emoji_bytes: smart_table::new(),
             markets_by_market_id: smart_table::new(),
             extend_ref,
             global_stats: GlobalStats {
@@ -1595,22 +1593,18 @@ if (!coin::is_account_registered<AptosCoin>(market_address)) {
     fun register_market_inner(
     registrant: &signer,
     title: vector<u8>,
-    symbol: vector<u8>,
     integrator: address,
     publish_code: bool,
      ) acquires Market, Registry, RegistryAddress {
         let registry_ref_mut = borrow_registry_ref_mut();
 
-        // Verify well-formed emoji bytes.
-        // let emoji_bytes = get_verified_symbol_emoji_bytes(registry_ref_mut, emojis);
-
-    // Verify market is not already registered by symbol.
-    let markets_by_symbol_ref = &registry_ref_mut.markets_by_symbol;
-    let already_registered = smart_table::contains(markets_by_symbol_ref, symbol);
+    // Verify market is not already registered by title.
+    let markets_by_title_ref = &registry_ref_mut.markets_by_emoji_bytes;
+    let already_registered = smart_table::contains(markets_by_title_ref, title);
     assert!(!already_registered, E_ALREADY_REGISTERED);
 
         // Create the Market object and add it to the registry.
-    let (market_address, market_signer) = create_market(registry_ref_mut, title, symbol);
+    let (market_address, market_signer) = create_market(registry_ref_mut, title);
 
     let market_ref_mut = borrow_global_mut<Market>(market_address);
 
@@ -2002,13 +1996,12 @@ let integrator_fee = fee;
 
     inline fun create_market(
     registry_ref_mut: &mut Registry,
-    title: vector<u8>,
-    symbol: vector<u8>,
+    emoji_bytes: vector<u8>,
     ): (address, signer) {
         // Create market object.
         let registry_signer = object::generate_signer_for_extending(&registry_ref_mut.extend_ref);
-        let markets_by_symbol_ref_mut = &mut registry_ref_mut.markets_by_symbol;
-        let market_constructor_ref = object::create_named_object(&registry_signer, symbol);
+        let markets_by_symbol_ref_mut = &mut registry_ref_mut.markets_by_emoji_bytes;
+        let market_constructor_ref = object::create_named_object(&registry_signer, emoji_bytes);
         let market_address = object::address_from_constructor_ref(&market_constructor_ref);
         let market_signer = object::generate_signer(&market_constructor_ref);
         let market_extend_ref = object::generate_extend_ref(&market_constructor_ref);
@@ -2022,8 +2015,7 @@ let integrator_fee = fee;
             metadata : MarketMetadata {
                 market_id,
                 market_address,
-                title,
-                symbol,
+                emoji_bytes
             },
             sequence_info: SequenceInfo {
                 last_bump_time: timestamp::now_microseconds(),
@@ -2083,7 +2075,7 @@ let integrator_fee = fee;
             ),
         });
         // Update registry.
-        smart_table::add(markets_by_symbol_ref_mut, symbol, market_address);
+        smart_table::add(markets_by_symbol_ref_mut, emoji_bytes, market_address);
         smart_table::add(&mut registry_ref_mut.markets_by_market_id, market_id, market_address);
 
         (market_address, market_signer)
@@ -2132,9 +2124,8 @@ let integrator_fee = fee;
     ) {
         if (!exists<LPCoinCapabilities<Movementcoin, MovementcoinLP>>(market_address)) {
             assert!(valid_coin_types<Movementcoin, MovementcoinLP>(market_address), E_INVALID_COIN_TYPES);
-            let symbol = string::utf8(market_ref.metadata.symbol);
-            let title = string::utf8(market_ref.metadata.title);
-
+            let title = string::utf8(market_ref.metadata.emoji_bytes);
+            let symbol = create_symbol_from_title(&market_ref.metadata.emoji_bytes);
 
             // Initialize emojicoin with fixed supply, throw away capabilities.
             let (burn_cap, freeze_cap, mint_cap) = coin::initialize<Movementcoin>(
@@ -2164,17 +2155,7 @@ let integrator_fee = fee;
                 DECIMALS,
                 MONITOR_SUPPLY,
             );
-        //             // Register LP coin metadata
-        // coin::register_with_metadata<MovementcoinLP>(
-        //     market_signer,
-        //     get_concatenation(symbol, string::utf8(EMOJICOIN_LP_NAME_SUFFIX)),
-        //     lp_symbol,
-        //     DECIMALS,
-        //     string::utf8(b"Disaster Relief LP Token - Provides liquidity for disaster relief fundraising"),
-        //     string::utf8(b"https://ipfs.io/ipfs/QmfAgD5QNwNRpwdfu2n7hGmtmRHZ2uuZYkYCx9jq7nA5rr"),
-        //     option::none(),
-        //     option::none()
-        // );
+
             coin::register<MovementcoinLP>(market_signer);
             coin::destroy_freeze_cap(freeze_cap);
             move_to(market_signer, LPCoinCapabilities<Movementcoin, MovementcoinLP> {
@@ -2570,6 +2551,32 @@ let integrator_fee = fee;
         type_info::struct_name(lp_type) == EMOJICOIN_LP_STRUCT_NAME
     }
 
+    inline fun create_symbol_from_title(title: &vector<u8>): string::String {
+    let symbol = vector::empty<u8>();
+    let len = vector::length(title);
+    let i = 0;
+    let take_next = true;
+
+    while (i < len) {
+        let ch = *vector::borrow(title, i);
+        if (take_next && ch != 32) {
+            // Uppercase it if it's lowercase ASCII a-z (97-122)
+            if (ch >= 97 && ch <= 122) {
+                vector::push_back(&mut symbol, ch - 32); // Convert to uppercase A-Z
+            } else {
+                vector::push_back(&mut symbol, ch);
+            };
+            take_next = false;
+        };
+        if (ch == 32) {
+            take_next = true;
+        };
+        i = i + 1;
+    };
+
+    string::utf8(symbol)
+}
+
     #[test_only] const MICROSECONDS_PER_SECOND: u64 = 1_000_000;
 
     #[test_only] public fun get_BASE_REAL_CEILING(): u64 { BASE_REAL_CEILING }
@@ -2673,12 +2680,12 @@ let integrator_fee = fee;
     }
 
     #[test_only] public fun register_market_without_publish(
-       registrant: &signer,
-    title: vector<u8>,
-    symbol: vector<u8>,
+    registrant: &signer,
+    emojis: vector<vector<u8>>,
     integrator: address,
     ) acquires Market, Registry, RegistryAddress {
-      register_market_inner(registrant, title, symbol, integrator, false);
+      let title = *vector::borrow(&emojis, 0);
+      register_market_inner(registrant, title, integrator, false);
     }
 
     #[test_only] public fun tvl_clamm_test_only(virtual_reserves: Reserves): u128 {

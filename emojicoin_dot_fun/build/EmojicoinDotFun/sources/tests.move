@@ -109,7 +109,7 @@
         // is_a_supported_chat_emoji,
         // is_a_supported_symbol_emoji,
         market_view,
-        market_metadata_by_symbol_bytes,
+        market_metadata_by_emoji_bytes,
         market_metadata_by_market_address,
         market_metadata_by_market_id,
         pack_reserves,
@@ -270,8 +270,7 @@
     struct MockMarketMetadata has copy, drop, store {
         market_id: u64,
         market_address: address,
-        title: vector<u8>,
-        symbol: vector<u8>,
+       emoji_bytes: vector<u8>,
     }
 
     struct MockMarketRegistration has copy, drop, store {
@@ -438,12 +437,12 @@
     const BLACK_CAT: vector<u8> = x"f09f9088e2808de2ac9b";
     const BLACK_HEART: vector<u8> = x"f09f96a4";
     const YELLOW_HEART: vector<u8> = x"f09f929b";
-const SAVE_CORAL_TITLE: vector<u8> = b"Save Coral";
-const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
-const STOP_WAR_TITLE: vector<u8> = b"Stop War";
-const STOP_WAR_SYMBOL: vector<u8> = b"SW";
-const END_HUNGER_TITLE: vector<u8> = b"End Hunger";
-const END_HUNGER_SYMBOL: vector<u8> = b"EH";
+    const SAVE_CORAL_TITLE: vector<u8> =  b"Save Coral";
+    const END_HUNGER_TITLE: vector<u8> = b"End Hunger";
+    const STOP_WAR_TITLE: vector<u8> =  b"Stop War";
+    const SAVE_CORAL_SYMBOL: vector<u8> = b"SC";
+    const END_HUNGER_SYMBOL: vector<u8> = b"EH";
+    const STOP_WAR_SYMBOL: vector<u8> = b"SW";
     // Polarity based on `is_sell` argument for swap functions in main file.
     const SWAP_BUY: bool = false;
     const SWAP_SELL: bool = true;
@@ -474,10 +473,10 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     const EXACT_TRANSITION_USER: address = @0xfffff;
 
     public fun address_for_registered_market_by_emoji_bytes(
-        symbol: vector<u8>,
+         emoji_bytes: vector<vector<u8>>,
     ): address {
-        let (_, market_address, _, _) = unpack_market_metadata(
-            metadata_for_registered_market_by_emoji_bytes(symbol)
+        let (_, market_address, _) = unpack_market_metadata(
+            metadata_for_registered_market_by_emoji_bytes(emoji_bytes)
         );
         market_address
     }
@@ -511,23 +510,20 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     // }
 
     public fun assert_coin_name_and_symbol<Movementcoin, MovementcoinLP>(
-    title: vector<u8>,
-    symbol: vector<u8>,
+emoji_bytes: vector<vector<u8>>,
+symbol: vector<u8>,
     expected_lp_symbol: vector<u8>,
      ) {
-        init_market_and_coins_via_swap<Movementcoin, MovementcoinLP>(title, symbol);
+        init_market_and_coins_via_swap<Movementcoin, MovementcoinLP>(emoji_bytes);
         
         // Test emojicoin name and symbol.
-        let title_str = utf8(title);
+        let title_str = utf8(*vector::borrow(&emoji_bytes, 0));
         let symbol_str = utf8(symbol);
-
-        // let name = get_concatenation(symbol_str, utf8(get_EMOJICOIN_NAME_SUFFIX()));
         assert!(coin::symbol<Movementcoin>() == symbol_str, 0);
         assert!(coin::name<Movementcoin>() == title_str, 0);
 
-
         // Test LP coin name and symbols.
-        let market_id = market_id_for_registered_market_by_emoji_bytes(symbol);
+        let market_id = market_id_for_registered_market_by_emoji_bytes(emoji_bytes);
         let lp_symbol = get_concatenation(
             utf8(get_EMOJICOIN_LP_SYMBOL_PREFIX()),
             string_utils::to_string(&market_id),
@@ -672,12 +668,10 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
         mock_metadata: MockMarketMetadata,
         metadata: MarketMetadata,
     ) {
-        let (market_id, market_address, title, symbol) = unpack_market_metadata(metadata);
- 
+     let (market_id, market_address, emoji_bytes) = unpack_market_metadata(metadata);
         assert!(market_id == mock_metadata.market_id, 0);
         assert!(market_address == mock_metadata.market_address, 0);
-        assert!(symbol == mock_metadata.symbol, 0);  
-        assert!(title == mock_metadata.title, 0);  
+        assert!(emoji_bytes == mock_metadata.emoji_bytes, 0);
 
     }
 
@@ -1010,18 +1004,17 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     }
 
     public fun assert_test_market_address(
-    title: vector<u8>,
-    symbol: vector<u8>,
+        emoji_bytes: vector<vector<u8>>,
         hard_coded_address: address,
         publish_code: bool,
     ) {
         mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_FEE() + get_MARKET_REGISTRATION_DEPOSIT());
         if (publish_code) { // Only one publication operation allowed per transaction.
-              register_market(&get_signer(USER), title, symbol, INTEGRATOR);
+              register_market(&get_signer(USER), emoji_bytes, INTEGRATOR);
         } else {
-             register_market_without_publish(&get_signer(USER), title, symbol, INTEGRATOR);
+             register_market_without_publish(&get_signer(USER), emoji_bytes, INTEGRATOR);
         };
-        let derived_market_address = address_for_registered_market_by_emoji_bytes(symbol);
+        let derived_market_address = address_for_registered_market_by_emoji_bytes(emoji_bytes);
         assert!(derived_market_address == hard_coded_address, 0);
     }
 
@@ -1211,8 +1204,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
         MockMarketMetadata {
             market_id: 1,
             market_address: @black_cat_market,
-            title: SAVE_CORAL_TITLE, 
-            symbol: SAVE_CORAL_SYMBOL
+            emoji_bytes: SAVE_CORAL_TITLE
         }
     }
 
@@ -1573,28 +1565,23 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     }
 
     public fun init_market(
-        title: vector<u8>,
-    symbol: vector<u8>,
+  emoji_bytes: vector<vector<u8>>,
     ) {
-        // let registry_view = registry_view();
-        // let (_, _, _, n_markets, _, _, _, _, _, _, _, _,) = unpack_registry_view(registry_view);
-        // if (n_markets > 0)
-        mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_FEE() + get_MARKET_REGISTRATION_DEPOSIT());
-       register_market_without_publish(&get_signer(USER), title, symbol, INTEGRATOR);
+      mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_FEE() + get_MARKET_REGISTRATION_DEPOSIT());
+      register_market_without_publish(&get_signer(USER), emoji_bytes, INTEGRATOR);
     }
 
     public fun init_market_and_coins_via_swap<Movementcoin, MovementcoinLP>(
-      title: vector<u8>,
-    symbol: vector<u8>,
+  emoji_bytes: vector<vector<u8>>,
     ) {
-        init_market(title, symbol);
+        init_market(emoji_bytes);
         let input_amount = 100;
         mint_aptos_coin_to(USER, input_amount);
         let integrator_fee_rate_bps = 0;
 
         swap<Movementcoin, MovementcoinLP>(
             &get_signer(USER),
-            address_for_registered_market_by_emoji_bytes(symbol),
+            address_for_registered_market_by_emoji_bytes(emoji_bytes),
             input_amount,
             SWAP_BUY,
             INTEGRATOR,
@@ -1613,7 +1600,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     public fun init_package_then_exact_transition(): Swap {
         init_package();
         timestamp::update_global_time_for_test(EXACT_TRANSITION_TIME);
-        init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+        init_market(vector[SAVE_CORAL_TITLE]);
         mint_aptos_coin_to(EXACT_TRANSITION_USER, EXACT_TRANSITION_INPUT_AMOUNT);
         let market_address = base_market_metadata().market_address;
         let simulated_swap = simulate_swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
@@ -1640,7 +1627,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     public fun init_package_then_simple_buy(): Swap {
         init_package();
         timestamp::update_global_time_for_test(SIMPLE_BUY_TIME);
-      init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+      init_market(vector[SAVE_CORAL_TITLE]);
         mint_aptos_coin_to(SIMPLE_BUY_USER, SIMPLE_BUY_INPUT_AMOUNT);
         let market_address = base_market_metadata().market_address;
         let simulated_swap = simulate_swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
@@ -1665,19 +1652,19 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     }
 
     public fun market_id_for_registered_market_by_emoji_bytes(
-        symbol: vector<u8>,
+         emoji_bytes: vector<vector<u8>>,
     ): u64 {
-        let (market_id, _, _, _) = unpack_market_metadata(
-            metadata_for_registered_market_by_emoji_bytes(symbol)
+        let (market_id, _, _) = unpack_market_metadata(
+            metadata_for_registered_market_by_emoji_bytes(emoji_bytes)
         );
         market_id
     }
 
     public fun metadata_for_registered_market_by_emoji_bytes(
-        symbol: vector<u8>,
+        emoji_bytes: vector<vector<u8>>,
     ): MarketMetadata {
          option::destroy_some(
-            market_metadata_by_symbol_bytes(symbol)
+           market_metadata_by_emoji_bytes(*vector::borrow(&emoji_bytes, 0))
         )
     }
 
@@ -2277,7 +2264,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
         location = emojicoin_dot_fun
     )] fun assert_valid_coin_types_bad_types() {
         init_package();
-        init_market( STOP_WAR_TITLE, STOP_WAR_SYMBOL);
+        init_market( vector[STOP_WAR_TITLE]);
                
         assert_valid_coin_types<BadType, BadType>(@yellow_heart_market);
     }
@@ -2561,17 +2548,17 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
         init_package();
 
         assert_coin_name_and_symbol<BlackCatEmojicoin, BlackCatEmojicoinLP>(
-            SAVE_CORAL_TITLE,
+            vector[SAVE_CORAL_TITLE],
             SAVE_CORAL_SYMBOL,
             b"LP-1",
         );
         assert_coin_name_and_symbol<BlackHeartEmojicoin, BlackHeartEmojicoinLP>(
-        STOP_WAR_TITLE,
+        vector[STOP_WAR_TITLE],
         STOP_WAR_SYMBOL,
             b"LP-2",
         );
         assert_coin_name_and_symbol<YellowHeartEmojicoin, YellowHeartEmojicoinLP>(
-           END_HUNGER_TITLE,
+           vector[END_HUNGER_TITLE],
         END_HUNGER_SYMBOL,
             b"LP-3",
         );
@@ -2602,23 +2589,20 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
 
         init_package();
  assert_test_market_address(
-            SAVE_CORAL_TITLE,
-            SAVE_CORAL_SYMBOL,
+        vector[SAVE_CORAL_TITLE],
         @black_cat_market,
         true
     );
 
     assert_test_market_address(
-          STOP_WAR_TITLE,
-          STOP_WAR_SYMBOL,
+        vector[STOP_WAR_TITLE],
         @black_heart_market,
         false
         // true
     );
 
     assert_test_market_address(
-        END_HUNGER_TITLE,
-        END_HUNGER_SYMBOL,
+        vector[END_HUNGER_TITLE],
         @yellow_heart_market,
         false
     );
@@ -2629,7 +2613,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
         location = emojicoin_dot_fun
     )] fun ensure_coins_initialized_invalid_coin_types() {
         init_package();
-         init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+         init_market(vector[SAVE_CORAL_TITLE]);
         swap<BlackCatEmojicoinLP, BlackCatEmojicoin>(
             &get_signer(USER),
             @black_cat_market,
@@ -2741,21 +2725,20 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
         init_package();
 
         // Assert all metadata empty before market is registered.
-        assert!(market_metadata_by_symbol_bytes(SAVE_CORAL_SYMBOL) == option::none(), 0);
+        assert!(market_metadata_by_emoji_bytes(SAVE_CORAL_TITLE) == option::none(), 0);
         assert!(market_metadata_by_market_address(@black_cat_market) == option::none(), 0);
         assert!(market_metadata_by_market_id(1) == option::none(), 0);
 
         // Register market, verify all getters return same metadata.
- init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+ init_market(vector[SAVE_CORAL_TITLE]);
         let mock_market_metadata = MockMarketMetadata {
             market_id: 1,
             market_address: @black_cat_market,
-               title: SAVE_CORAL_TITLE, 
-            symbol: SAVE_CORAL_SYMBOL
+            emoji_bytes: SAVE_CORAL_TITLE, 
         };
         assert_market_metadata(
             mock_market_metadata,
-            option::destroy_some(market_metadata_by_symbol_bytes(SAVE_CORAL_SYMBOL)),
+            option::destroy_some(market_metadata_by_emoji_bytes(SAVE_CORAL_TITLE)),
         );
         assert_market_metadata(
             mock_market_metadata,
@@ -3276,8 +3259,8 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     )] fun register_market_already_registered() {
         init_package();
         mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_DEPOSIT() + get_MARKET_REGISTRATION_FEE());
-        register_market(&get_signer(USER), SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL, INTEGRATOR);
-        register_market(&get_signer(USER), SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL, INTEGRATOR);
+        register_market(&get_signer(USER), vector[SAVE_CORAL_TITLE], INTEGRATOR);
+        register_market(&get_signer(USER), vector[SAVE_CORAL_TITLE], INTEGRATOR);
     }
 
     #[test] fun register_market_comprehensive_state_assertion() {
@@ -3307,13 +3290,12 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
         timestamp::update_global_time_for_test(time);
         mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_DEPOSIT() + get_MARKET_REGISTRATION_DEPOSIT());
 
-                 register_market(&get_signer(USER), SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL, INTEGRATOR);
+                 register_market(&get_signer(USER), vector[SAVE_CORAL_TITLE], INTEGRATOR);
         let market_view = base_market_view();
         let market_metadata_1 = MockMarketMetadata {
             market_id: 1,
             market_address: @black_cat_market,
-                      title: SAVE_CORAL_TITLE, 
-            symbol: SAVE_CORAL_SYMBOL
+            emoji_bytes: SAVE_CORAL_TITLE, 
         };
         market_view.metadata = market_metadata_1;
         market_view.sequence_info.last_bump_time = time;
@@ -3365,12 +3347,11 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
 
         // Register new market, assert state.
         mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_FEE() + get_MARKET_REGISTRATION_DEPOSIT());
-       register_market_without_publish(&get_signer(USER), STOP_WAR_TITLE, STOP_WAR_SYMBOL, INTEGRATOR);
+       register_market_without_publish(&get_signer(USER), vector[STOP_WAR_TITLE], INTEGRATOR);
         let market_metadata_2 = MockMarketMetadata {
             market_id: 2,
             market_address: @black_heart_market,
-                       title: STOP_WAR_TITLE, 
-            symbol: STOP_WAR_SYMBOL
+            emoji_bytes: STOP_WAR_TITLE
         };
         market_view.metadata = market_metadata_2;
         market_view.sequence_info.last_bump_time = time;
@@ -3447,7 +3428,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     )] fun register_market_unable_to_pay_market_registration_deposit() {
         init_package();
         mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_DEPOSIT());
-        register_market(&get_signer(USER), SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL, INTEGRATOR);
+        register_market(&get_signer(USER), vector[SAVE_CORAL_TITLE], INTEGRATOR);
     }
 
     #[test, expected_failure(
@@ -3456,8 +3437,8 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     )] fun register_market_unable_to_pay_market_registration_fee() {
         init_package();
         mint_aptos_coin_to(USER, get_MARKET_REGISTRATION_DEPOSIT() * 2);
-                 register_market(&get_signer(USER), SAVE_CORAL_TITLE,SAVE_CORAL_SYMBOL, INTEGRATOR);
-      register_market_without_publish(&get_signer(USER), STOP_WAR_TITLE, STOP_WAR_SYMBOL, INTEGRATOR);
+        register_market(&get_signer(USER), vector[SAVE_CORAL_TITLE], INTEGRATOR);
+        register_market_without_publish(&get_signer(USER), vector[STOP_WAR_TITLE], INTEGRATOR);
     }
 
     // #[test] fun register_market_with_compound_emoji_sequence() {
@@ -3469,10 +3450,10 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     //     let concatenated_bytes = verified_symbol_emoji_bytes(emojis);
 
     //     // Verify market is not already registered, register, then verify is registered.
-    //     assert!(market_metadata_by_symbol_bytes(concatenated_bytes) == option::none(), 0);
+    //     assert!(market_metadata_by_emoji_bytes(concatenated_bytes) == option::none(), 0);
     //      init_market(b"End Hunger", b"EH");
     //     let market_metadata =
-    //         option::destroy_some(market_metadata_by_symbol_bytes(concatenated_bytes));
+    //         option::destroy_some(market_metadata_by_emoji_bytes(concatenated_bytes));
     //     let (_, _, market_metadata_byes) = unpack_market_metadata(market_metadata);
     //     assert!(market_metadata_byes == concatenated_bytes, 0);
     // }
@@ -3620,7 +3601,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
 
     #[test] fun simulate_swap_balance_before_zero_cases() {
         init_package();
-        init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+        init_market(vector[SAVE_CORAL_TITLE]);
         disable_registrant_grace_period_check(@black_cat_market);
 
         // Verify balance as fraction reported as 0 for no circulating supply.
@@ -3841,7 +3822,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     #[test] fun swap_initializes_coin_capabilities() {
         init_package();
 
-        init_market_and_coins_via_swap<YellowHeartEmojicoin, YellowHeartEmojicoinLP>(END_HUNGER_TITLE, END_HUNGER_SYMBOL);
+        init_market_and_coins_via_swap<YellowHeartEmojicoin, YellowHeartEmojicoinLP>(vector[END_HUNGER_TITLE]);
         assert!(
             exists_lp_coin_capabilities<YellowHeartEmojicoin, YellowHeartEmojicoinLP>(
                 @yellow_heart_market
@@ -3853,7 +3834,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     // Verify registrant able to buy after period, then non-registrant can buy right after.
     #[test] fun swap_grace_period_is_registrant_after_period() {
         init_package();
-      init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+      init_market(vector[SAVE_CORAL_TITLE]);
         timestamp::update_global_time_for_test(get_PERIOD_5M() + 1);
         mint_aptos_coin_to(USER, SIMPLE_BUY_INPUT_AMOUNT);
         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
@@ -3880,7 +3861,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     // Verify registrant able to buy during period, then non-registrant can buy right after.
     #[test] fun swap_grace_period_is_registrant_during_period() {
         init_package();
-       init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+       init_market(vector[SAVE_CORAL_TITLE]);
         timestamp::update_global_time_for_test(get_PERIOD_5M());
         mint_aptos_coin_to(USER, SIMPLE_BUY_INPUT_AMOUNT);
         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
@@ -3908,7 +3889,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
     // Verify non-registrant user can buy after the grace period has lapsed, then again after that.
     #[test] fun swap_grace_period_not_registrant_after_period() {
         init_package();
-   init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+   init_market(vector[SAVE_CORAL_TITLE]);
         timestamp::update_global_time_for_test(get_PERIOD_5M() + 1);
         mint_aptos_coin_to(SIMPLE_BUY_USER, SIMPLE_BUY_INPUT_AMOUNT);
         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
@@ -3938,7 +3919,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
         location = emojicoin_dot_fun::emojicoin_dot_fun,
     )] fun swap_grace_period_not_registrant_during_period() {
         init_package();
-    init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+    init_market(vector[SAVE_CORAL_TITLE]);
         timestamp::update_global_time_for_test(get_PERIOD_5M());
         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
             &get_signer(SIMPLE_BUY_USER),
@@ -3953,7 +3934,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
 
     #[test] fun swap_min_output_met_exactly() {
         init_package();
-      init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+      init_market(vector[SAVE_CORAL_TITLE]);
         disable_registrant_grace_period_check(@black_cat_market);
         mint_aptos_coin_to(EXACT_TRANSITION_USER, EXACT_TRANSITION_INPUT_AMOUNT);
         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
@@ -3972,7 +3953,7 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
         location = emojicoin_dot_fun::emojicoin_dot_fun,
     )] fun swap_min_output_not_met_just_barely() {
         init_package();
-     init_market(SAVE_CORAL_TITLE, SAVE_CORAL_SYMBOL);
+     init_market(vector[SAVE_CORAL_TITLE]);
         disable_registrant_grace_period_check(@black_cat_market);
         mint_aptos_coin_to(EXACT_TRANSITION_USER, EXACT_TRANSITION_INPUT_AMOUNT);
         swap<BlackCatEmojicoin, BlackCatEmojicoinLP>(
@@ -4591,12 +4572,12 @@ const END_HUNGER_SYMBOL: vector<u8> = b"EH";
         // Advance timer 1 microsecond, register a new market.
         time = time + 1;
         timestamp::update_global_time_for_test(time);
- init_market(END_HUNGER_TITLE, END_HUNGER_SYMBOL);
+ init_market(vector[END_HUNGER_TITLE]);
         // Advance timer to next 1 day boundary, register a new market.
         time = get_PERIOD_1D();
         timestamp::update_global_time_for_test(time);
         
- init_market(STOP_WAR_TITLE, STOP_WAR_SYMBOL);
+ init_market(vector[STOP_WAR_TITLE]);
         // Chat on original market, thus resetting periodic state trackers.
         chat<BlackCatEmojicoin, BlackCatEmojicoinLP>(
             &get_signer(USER),
