@@ -15,7 +15,7 @@
 //
 // cspell:word EINSUFFICIENT_BALANCE
 #[test_only] module emojicoin_dot_fun::tests {
-    // use aptos_std::debug::print;
+    use aptos_std::debug::print;
     use aptos_framework::account::{create_signer_for_test as get_signer};
     use aptos_framework::aggregator_v2::read_snapshot;
     // use aptos_framework::account;
@@ -515,10 +515,16 @@ symbol: vector<u8>,
     expected_lp_symbol: vector<u8>,
      ) {
         init_market_and_coins_via_swap<Movementcoin, MovementcoinLP>(emoji_bytes);
+
         
         // Test emojicoin name and symbol.
         let title_str = utf8(*vector::borrow(&emoji_bytes, 0));
         let symbol_str = utf8(symbol);
+                       print<vector<vector<u8>>>(&emoji_bytes); 
+               print<String>(&coin::name<Movementcoin>());    
+               print<String>(&utf8(*vector::borrow(&emoji_bytes, 0))); 
+               print<String>(&symbol_str);  
+               print<String>(&coin::symbol<Movementcoin>());  
         assert!(coin::symbol<Movementcoin>() == symbol_str, 0);
         assert!(coin::name<Movementcoin>() == title_str, 0);
 
@@ -2546,7 +2552,6 @@ symbol: vector<u8>,
 
     #[test] fun coin_names_and_symbols() {
         init_package();
-
         assert_coin_name_and_symbol<BlackCatEmojicoin, BlackCatEmojicoinLP>(
             vector[SAVE_CORAL_TITLE],
             SAVE_CORAL_SYMBOL,

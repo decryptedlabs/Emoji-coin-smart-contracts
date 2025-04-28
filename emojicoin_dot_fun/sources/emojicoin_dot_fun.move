@@ -429,6 +429,7 @@ public entry fun register_market(
     integrator: address,
 ) acquires Market, Registry, RegistryAddress {
     let title = *vector::borrow(&emojis, 0);
+    
     register_market_inner(registrant, title, integrator, true);
 }
 
@@ -2126,7 +2127,6 @@ let integrator_fee = fee;
             assert!(valid_coin_types<Movementcoin, MovementcoinLP>(market_address), E_INVALID_COIN_TYPES);
             let title = string::utf8(market_ref.metadata.emoji_bytes);
             let symbol = create_symbol_from_title(&market_ref.metadata.emoji_bytes);
-
             // Initialize emojicoin with fixed supply, throw away capabilities.
             let (burn_cap, freeze_cap, mint_cap) = coin::initialize<Movementcoin>(
                 market_signer,
