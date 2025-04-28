@@ -4148,7 +4148,7 @@ symbol: vector<u8>,
         chat<BlackCatEmojicoin, BlackCatEmojicoinLP>(
             &get_signer(USER),
             @black_cat_market,
-          b"Hello"
+          b"Hello world"
         );
 
         // Verify the periodic state event.

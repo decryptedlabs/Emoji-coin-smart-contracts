@@ -757,7 +757,7 @@ if (!coin::is_account_registered<AptosCoin>(market_address)) {
         market_address: address,
         message_bytes: vector<u8>, 
     ) acquires Market, Registry, RegistryAddress {
-
+       
         // Mutably borrow market and check its coin types.
         let (market_ref_mut, market_signer) = get_market_ref_mut_and_signer_checked(market_address);
         ensure_coins_initialized<Movementcoin, MovementcoinLP>(
@@ -2007,7 +2007,6 @@ let integrator_fee = fee;
         let market_extend_ref = object::generate_extend_ref(&market_constructor_ref);
         let market_id = 1 + smart_table::length(markets_by_symbol_ref_mut);
         // Only assess integrator fees for markets after the first.
-        // let integrator_fees = if (market_id == 1) 0 else (MARKET_REGISTRATION_FEE as u128); 
         let integrator_fees = MARKET_REGISTRATION_FEE as u128; 
 
         let time = timestamp::now_microseconds();
@@ -2165,25 +2164,6 @@ let integrator_fee = fee;
             });
         };
     }
-
-    /// Adds all supplemental chat emojis to the registry if they haven't been added yet. Returns
-    /// true if the supplemental chat emojis were added, false otherwise.
-    // inline fun ensure_supplemental_chat_emojis_initialized(
-    //     registry_ref_mut: &mut Registry
-    //  ): bool acquires Registry, RegistryAddress {
-    //     let supplemental_chat_emojis_ref_mut = &mut registry_ref_mut.supplemental_chat_emojis;
-
-    //     let supplemental_chat_emojis = hex_codes::get_supplemental_chat_emojis();
-    //     let emoji_0 = *vector::borrow(&supplemental_chat_emojis, 0);
-    //     if (table::contains(supplemental_chat_emojis_ref_mut, emoji_0)) {
-    //         false
-    //     } else {
-    //         vector::for_each(supplemental_chat_emojis, |emoji| {
-    //             table::add(supplemental_chat_emojis_ref_mut, emoji, 0);
-    //         });
-    //         true
-    //     }
-    // }
 
     inline fun fdv(
         reserves: Reserves,
