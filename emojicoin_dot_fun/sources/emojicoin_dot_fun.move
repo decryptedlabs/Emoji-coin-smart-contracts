@@ -18,7 +18,7 @@ module emojicoin_dot_fun::emojicoin_dot_fun {
     use std::signer;
     use std::string::{Self, String}; 
     use std::vector;
-    // use aptos_std::debug;
+    use aptos_std::debug::print;
 
 
 
@@ -2123,6 +2123,7 @@ let integrator_fee = fee;
         market_address: address,
     ) {
         if (!exists<LPCoinCapabilities<Movementcoin, MovementcoinLP>>(market_address)) {
+
             assert!(valid_coin_types<Movementcoin, MovementcoinLP>(market_address), E_INVALID_COIN_TYPES);
             let title = string::utf8(market_ref.metadata.emoji_bytes);
             let symbol = create_symbol_from_title(&market_ref.metadata.emoji_bytes);
@@ -2540,7 +2541,6 @@ let integrator_fee = fee;
     }
 
     inline fun valid_coin_types<Movementcoin, MovementcoinLP>(market_address: address): bool {
-
         let emoji_type = &type_info::type_of<Movementcoin>();
         let lp_type = &type_info::type_of<MovementcoinLP>();
         type_info::account_address(emoji_type) == market_address    &&
