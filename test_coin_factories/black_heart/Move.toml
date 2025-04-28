@@ -1,5 +1,5 @@
 [addresses]
-black_heart_market = "0xedf96c2c141657d311170c3681d917e1534c6f14f2efa00de2a9a5da60d5b0c0"
+black_heart_market = "0x3d3dc9690e20dbb0de5d1a3522c11b33f4296e05242cd3948ad6d09989420eb6"
 
 [dev-dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-core.git"

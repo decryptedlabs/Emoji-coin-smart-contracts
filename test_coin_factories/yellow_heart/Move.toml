@@ -1,5 +1,5 @@
 [addresses]
-yellow_heart_market = "0xcbd82a44ed777632f21e0100693f81cce73e685ec1d586408d8e86b95d2821aa"
+yellow_heart_market = "0xa0970bfd8f24eb4fe92a4f9980bf87b2c5594057d6942be5bbd5ee5ba6c20151"
 
 [dev-dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-core.git"

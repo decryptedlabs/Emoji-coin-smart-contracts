@@ -1,5 +1,5 @@
 [addresses]
-black_cat_market = "0x44271bf1b1f9945a0c3e0d9a14c7e7d6df07472045d9d395cc4858951549f89"
+black_cat_market = "0xdeff86f3b38ec5f2668729a2df725d1f5ab03529e14ebba5d2ddfc36abaf23ca"
 
 [dev-dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-core.git"
