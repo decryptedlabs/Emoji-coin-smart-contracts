@@ -106,5 +106,3 @@ aptos multisig execute-with-payload \
     --multisig-address $MULTISIG \
     --profile emojicoin-testnet
 ```
-
-
